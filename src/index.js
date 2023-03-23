@@ -144,7 +144,7 @@ function init() {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.enableZoom = true;
-    controls.enablePan = false;
+    controls.screenSpacePanning = false;
 
     stats = new Stats();
     document.body.appendChild(stats.dom);
