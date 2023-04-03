@@ -8,7 +8,9 @@ let camera, scene, renderer, controls, stats;
 
 let swithes_mesh;
 let tubes_mesh;
+let line_mesh;
 let all_mesh;
+
 
 const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
@@ -97,6 +99,7 @@ function init() {
 
 
     all_mesh = new THREE.Group();
+    line_mesh = new THREE.Group();
     swithes_mesh = new THREE.InstancedMesh(sphere, swithes_material, sphere_positions.length);
 
     for (let i = 0; i < sphere_positions.length; i++) {
@@ -110,8 +113,7 @@ function init() {
     swithes_mesh.castShadow = true;
     swithes_mesh.userData.clickable = true;
 
-    // scene.add(swithes_mesh);
-    all_mesh.add(swithes_mesh);
+    line_mesh.add(swithes_mesh);
 
     tubes_mesh = new THREE.InstancedMesh(cylinder, cylinder_material, cylinder_positions.length);
 
@@ -127,8 +129,8 @@ function init() {
     tubes_mesh.castShadow = true;
     tubes_mesh.userData.clickable = false;
 
-    // scene.add(tubes_mesh);
-    all_mesh.add(tubes_mesh);
+    line_mesh.add(tubes_mesh);
+    all_mesh.add(line_mesh);
     scene.add(all_mesh);
 
     loader.load(
@@ -163,6 +165,8 @@ function init() {
             console.log('An error happened: ' + error);
         }
     );
+
+    line_mesh.scale.set(0.2,0.2,0.2);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
