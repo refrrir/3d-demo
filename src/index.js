@@ -37,7 +37,7 @@ animate();
 function init() {
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(5, 5, 5);
+    camera.position.set(30, 6, 30);
     camera.lookAt(0, 0, 0);
 
     scene = new THREE.Scene();
@@ -49,12 +49,12 @@ function init() {
     const spotLight = new THREE.SpotLight(0xffffff);
     spotLight.angle = Math.PI / 5;
     spotLight.penumbra = 0.2;
-    spotLight.position.set(50, 30, 30);
+    spotLight.position.set(30, 20, 30);
     spotLight.castShadow = true;
     // spotLight.shadow.camera.near = 3;
     // spotLight.shadow.camera.far = 10;
-    // spotLight.shadow.mapSize.width = 1024;
-    // spotLight.shadow.mapSize.height = 1024;
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
     scene.add(spotLight);
 
     const dirLight = new THREE.DirectionalLight(0x55505a, 1);
@@ -120,23 +120,31 @@ function init() {
         tubes_mesh.setColorAt(i, green);
     }
 
+    tubes_mesh.castShadow = true;
+
+    scene.add(tubes_mesh);
+
     loader.load(
         // resource URL
         '../models/3D_House_n.gltf',
         // called when the resource is loaded
         function (gltf) {
+            gltf.scene.traverse(function (node) {
+                if (node.isMesh) { 
+                    node.castShadow = true; 
+                    node.userData.blocking = true;
+                    // node.receiveShadow = true;
+                }
+            })
             scene.add(gltf.scene);
             gltf.animations; // Array<THREE.AnimationClip>
-            // gltf.scene.scale.set(0.1, 0.1, 0.1); // THREE.Group
+            gltf.scene.scale.set(2, 2, 2); // THREE.Group
             gltf.scene.rotation.x -= Math.PI * 0.5;
             gltf.scenes; // Array<THREE.Group>
             gltf.asset; // Object
-            gltf.scene.add(dirLight);
-            gltf.scene.add(spotLight);
-            gltf.scene.position.setX(-15);
+            gltf.scene.position.setX(-20);
             gltf.scene.position.setZ(15);
             gltf.scene.position.setY(-1);
-            gltf
         },
         // called while loading is progressing
         function (xhr) {
@@ -147,10 +155,6 @@ function init() {
             console.log('An error happened: ' + error);
         }
     );
-
-    tubes_mesh.castShadow = true;
-
-    scene.add(tubes_mesh);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -171,6 +175,7 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
+    controls.maxPolarAngle = Math.PI * 0.5;
     controls.enableDamping = true;
     controls.enableZoom = true;
     controls.screenSpacePanning = false;
