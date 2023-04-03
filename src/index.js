@@ -8,6 +8,7 @@ let camera, scene, renderer, controls, stats;
 
 let swithes_mesh;
 let tubes_mesh;
+let all_mesh;
 
 const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
@@ -95,6 +96,7 @@ function init() {
     const cylinder_material = new THREE.MeshPhongMaterial({ color: white });
 
 
+    all_mesh = new THREE.Group();
     swithes_mesh = new THREE.InstancedMesh(sphere, swithes_material, sphere_positions.length);
 
     for (let i = 0; i < sphere_positions.length; i++) {
@@ -106,8 +108,10 @@ function init() {
     }
 
     swithes_mesh.castShadow = true;
+    swithes_mesh.userData.clickable = true;
 
-    scene.add(swithes_mesh);
+    // scene.add(swithes_mesh);
+    all_mesh.add(swithes_mesh);
 
     tubes_mesh = new THREE.InstancedMesh(cylinder, cylinder_material, cylinder_positions.length);
 
@@ -121,8 +125,11 @@ function init() {
     }
 
     tubes_mesh.castShadow = true;
+    tubes_mesh.userData.clickable = false;
 
-    scene.add(tubes_mesh);
+    // scene.add(tubes_mesh);
+    all_mesh.add(tubes_mesh);
+    scene.add(all_mesh);
 
     loader.load(
         // resource URL
@@ -130,13 +137,14 @@ function init() {
         // called when the resource is loaded
         function (gltf) {
             gltf.scene.traverse(function (node) {
-                if (node.isMesh) { 
-                    node.castShadow = true; 
-                    node.userData.blocking = true;
+                if (node.isMesh) {
+                    node.castShadow = true;
+                    node.userData.clickable = false;
                     // node.receiveShadow = true;
                 }
             })
             scene.add(gltf.scene);
+            all_mesh.add(gltf.scene);
             gltf.animations; // Array<THREE.AnimationClip>
             gltf.scene.scale.set(2, 2, 2); // THREE.Group
             gltf.scene.rotation.x -= Math.PI * 0.5;
@@ -206,46 +214,50 @@ function onMouseDown(event) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    const intersection = raycaster.intersectObject(swithes_mesh);
+    const intersection = raycaster.intersectObject(all_mesh);
 
     if (intersection.length > 0) {
 
-        const instanceId = intersection[0].instanceId;
+        const userData = intersection[0].object.userData;
+        if (userData.clickable) {
 
-        const tubeId = findRelatedTubes(instanceId);
+            const instanceId = intersection[0].instanceId;
 
-        isSwithOn = !isSwithOn;
+            const tubeId = findRelatedTubes(instanceId);
 
-        swithes_mesh.getColorAt(instanceId, color);
+            isSwithOn = !isSwithOn;
 
-        if (isSwithOn == true) {
+            swithes_mesh.getColorAt(instanceId, color);
 
-            swithes_mesh.setColorAt(instanceId, red);
+            if (isSwithOn == true) {
 
-            swithes_mesh.instanceColor.needsUpdate = true;
+                swithes_mesh.setColorAt(instanceId, red);
+
+                swithes_mesh.instanceColor.needsUpdate = true;
 
 
-            if (tubeId !== -1) {
+                if (tubeId !== -1) {
 
-                tubes_mesh.setColorAt(tubeId, white);
+                    tubes_mesh.setColorAt(tubeId, white);
 
-                tubes_mesh.instanceColor.needsUpdate = true;
+                    tubes_mesh.instanceColor.needsUpdate = true;
+                }
             }
-        }
-        else if (isSwithOn == false) {
+            else if (isSwithOn == false) {
 
-            swithes_mesh.setColorAt(instanceId, white);
+                swithes_mesh.setColorAt(instanceId, white);
 
-            swithes_mesh.instanceColor.needsUpdate = true;
+                swithes_mesh.instanceColor.needsUpdate = true;
 
-            if (tubeId !== -1) {
+                if (tubeId !== -1) {
 
-                tubes_mesh.setColorAt(tubeId, green);
+                    tubes_mesh.setColorAt(tubeId, green);
 
-                tubes_mesh.instanceColor.needsUpdate = true;
+                    tubes_mesh.instanceColor.needsUpdate = true;
+                }
+
+
             }
-
-
         }
 
     }
