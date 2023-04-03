@@ -2,12 +2,14 @@ import * as THREE from 'three';
 
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 let camera, scene, renderer, controls, stats;
 
 let swithes_mesh;
 let tubes_mesh;
 
+const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
 
@@ -41,23 +43,22 @@ function init() {
     scene = new THREE.Scene();
 
     scene.background = new THREE.Color(0xa0a0a0);
-    scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 
     // LIGHT
 
     const spotLight = new THREE.SpotLight(0xffffff);
     spotLight.angle = Math.PI / 5;
     spotLight.penumbra = 0.2;
-    spotLight.position.set(8, 12, 12);
+    spotLight.position.set(50, 30, 30);
     spotLight.castShadow = true;
-    spotLight.shadow.camera.near = 3;
-    spotLight.shadow.camera.far = 10;
-    spotLight.shadow.mapSize.width = 1024;
-    spotLight.shadow.mapSize.height = 1024;
+    // spotLight.shadow.camera.near = 3;
+    // spotLight.shadow.camera.far = 10;
+    // spotLight.shadow.mapSize.width = 1024;
+    // spotLight.shadow.mapSize.height = 1024;
     scene.add(spotLight);
 
     const dirLight = new THREE.DirectionalLight(0x55505a, 1);
-    dirLight.position.set(-1, 3, 3);
+    dirLight.position.set(-10, 30, 30);
     dirLight.castShadow = true;
 
     dirLight.shadow.mapSize.width = 1024;
@@ -118,6 +119,34 @@ function init() {
         tubes_mesh.setMatrixAt(i, cylinder_matrix);
         tubes_mesh.setColorAt(i, green);
     }
+
+    loader.load(
+        // resource URL
+        '../models/3D_House_n.gltf',
+        // called when the resource is loaded
+        function (gltf) {
+            scene.add(gltf.scene);
+            gltf.animations; // Array<THREE.AnimationClip>
+            // gltf.scene.scale.set(0.1, 0.1, 0.1); // THREE.Group
+            gltf.scene.rotation.x -= Math.PI * 0.5;
+            gltf.scenes; // Array<THREE.Group>
+            gltf.asset; // Object
+            gltf.scene.add(dirLight);
+            gltf.scene.add(spotLight);
+            gltf.scene.position.setX(-15);
+            gltf.scene.position.setZ(15);
+            gltf.scene.position.setY(-1);
+            gltf
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened: ' + error);
+        }
+    );
 
     tubes_mesh.castShadow = true;
 
