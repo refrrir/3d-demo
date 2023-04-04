@@ -6,4 +6,10 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  resolve: {
+    alias: {
+      "@colors": path.resolve(__dirname, "src/colors"),
+      "@objects": path.resolve(__dirname, "src/objects"),
+    }
+  }
 };

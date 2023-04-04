@@ -3,13 +3,15 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SwitchMesh, TubeMesh } from '@objects';
+
 
 let camera, scene, renderer, controls, stats;
 
-let swithes_mesh;
-let tubes_mesh;
-let line_mesh;
-let all_mesh;
+let swithes_mesh; //开关
+let tubes_mesh; //管道
+let line_mesh; //线路 = 开关 + 管道
+let all_mesh; //开关 + 管道 + 外载模型 
 
 
 const loader = new GLTFLoader();
@@ -92,45 +94,20 @@ function init() {
     scene.add(grid);
 
 
-    const sphere = new THREE.IcosahedronGeometry(0.8, 3);
-    const cylinder = new THREE.CylinderGeometry(0.5, 0.5, 3, 50);
-    const swithes_material = new THREE.MeshPhongMaterial({ color: white });
-    const cylinder_material = new THREE.MeshPhongMaterial({ color: white });
-
-
     all_mesh = new THREE.Group();
     line_mesh = new THREE.Group();
-    swithes_mesh = new THREE.InstancedMesh(sphere, swithes_material, sphere_positions.length);
 
-    for (let i = 0; i < sphere_positions.length; i++) {
-        const sphere_matrix = new THREE.Matrix4();
-        sphere_matrix.setPosition(sphere_positions[i].x, sphere_positions[i].y, sphere_positions[i].z);
 
-        swithes_mesh.setMatrixAt(i, sphere_matrix);
-        swithes_mesh.setColorAt(i, white);
-    }
+    // 线路初始化
 
-    swithes_mesh.castShadow = true;
-    swithes_mesh.userData.clickable = true;
+    //开关初始化
+    line_mesh.add(swithes_mesh = new SwitchMesh(sphere_positions).init());
+    
+    //管道初始化
+    line_mesh.add(tubes_mesh = new TubeMesh(cylinder_rotations, cylinder_positions).init());
 
-    line_mesh.add(swithes_mesh);
-
-    tubes_mesh = new THREE.InstancedMesh(cylinder, cylinder_material, cylinder_positions.length);
-
-    for (let i = 0; i < cylinder_positions.length; i++) {
-        const cylinder_matrix = new THREE.Matrix4();
-        cylinder_matrix.makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(cylinder_rotations[i].axis, cylinder_rotations[i].degree));
-        cylinder_matrix.multiply(new THREE.Matrix4().makeTranslation(cylinder_positions[i].x, cylinder_positions[i].y, cylinder_positions[i].z));
-
-        tubes_mesh.setMatrixAt(i, cylinder_matrix);
-        tubes_mesh.setColorAt(i, green);
-    }
-
-    tubes_mesh.castShadow = true;
-    tubes_mesh.userData.clickable = false;
-
-    line_mesh.add(tubes_mesh);
     all_mesh.add(line_mesh);
+
     scene.add(all_mesh);
 
     loader.load(
