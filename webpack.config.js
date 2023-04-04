@@ -10,6 +10,7 @@ module.exports = {
     alias: {
       "@colors": path.resolve(__dirname, "src/colors"),
       "@objects": path.resolve(__dirname, "src/objects"),
+      "@models": path.resolve(__dirname, "src/models"),
     }
   }
 };

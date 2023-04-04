@@ -4,6 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { SwitchMesh, TubeMesh } from '@objects';
+import { LineMeshInputProps } from '@models';
 
 
 let camera, scene, renderer, controls, stats;
@@ -30,9 +31,11 @@ const directions = {
 };
 
 let isSwithOn = false;
-const sphere_positions = [{ x: 0, y: 0, z: 0 }];
-const cylinder_positions = [{ x: 0, y: 2, z: 0 }, { x: 0, y: 2, z: 0 }];
-const cylinder_rotations = [{ axis: directions.directions_z, degree: Math.PI * 0.5 }, { axis: directions.directions_x, degree: 0 }];
+const switch_mesh_inputs = [new LineMeshInputProps(0, 0, 0, null, null)];
+const tube_mesh_inputs = [
+    new LineMeshInputProps(0, 2, 0, directions.directions_z, Math.PI * 0.5),
+    new LineMeshInputProps(0, 2, 0, directions.directions_x, 0)
+];
 
 const swithes_tubes_relations = [{ switch_index: 0, tube_index: 0 }];
 
@@ -101,10 +104,10 @@ function init() {
     // 线路初始化
 
     //开关初始化
-    line_mesh.add(swithes_mesh = new SwitchMesh(sphere_positions).init());
-    
+    line_mesh.add(swithes_mesh = new SwitchMesh(switch_mesh_inputs).init());
+
     //管道初始化
-    line_mesh.add(tubes_mesh = new TubeMesh(cylinder_rotations, cylinder_positions).init());
+    line_mesh.add(tubes_mesh = new TubeMesh(tube_mesh_inputs).init());
 
     all_mesh.add(line_mesh);
 
@@ -143,7 +146,7 @@ function init() {
         }
     );
 
-    line_mesh.scale.set(0.2,0.2,0.2);
+    line_mesh.scale.set(0.2, 0.2, 0.2);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
