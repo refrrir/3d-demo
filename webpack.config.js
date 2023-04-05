@@ -8,7 +8,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "@colors": path.resolve(__dirname, "src/colors"),
+      "@constants": path.resolve(__dirname, "src/constants"),
       "@objects": path.resolve(__dirname, "src/objects"),
       "@models": path.resolve(__dirname, "src/models"),
     }

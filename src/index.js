@@ -4,12 +4,13 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { SwitchMesh, TubeMesh } from '@objects';
-import { LineMeshInputProps } from '@models';
+import { LineMeshInputProps, SwitchMeshInputProps } from '@models';
+import { COLOR, DIRECTION } from '@constants';
 
 
 let camera, scene, renderer, controls, stats;
 
-let swithes_mesh; //开关
+let switches_mesh; //开关
 let tubes_mesh; //管道
 let line_mesh; //线路 = 开关 + 管道
 let all_mesh; //开关 + 管道 + 外载模型 
@@ -19,25 +20,15 @@ const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
 
-const color = new THREE.Color();
-const white = new THREE.Color().setHex(0xffffff);
-const red = new THREE.Color().setHex(0xff0000);
-const green = new THREE.Color().setHex(0x097969);
+const white = COLOR.WHITE;
 
-const directions = {
-    directions_x: new THREE.Vector3(1, 0, 0),
-    directions_y: new THREE.Vector3(0, 1, 0),
-    directions_z: new THREE.Vector3(0, 0, 1)
-};
-
-let isSwithOn = false;
-const switch_mesh_inputs = [new LineMeshInputProps(0, 0, 0, null, null)];
+const switch_mesh_inputs = [new SwitchMeshInputProps(0, 0, 0, null, null, true)];
 const tube_mesh_inputs = [
-    new LineMeshInputProps(0, 2, 0, directions.directions_z, Math.PI * 0.5),
-    new LineMeshInputProps(0, 2, 0, directions.directions_x, 0)
+    new LineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
+    new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0)
 ];
 
-const swithes_tubes_relations = [{ switch_index: 0, tube_index: 0 }];
+const swithes_tubes_relations = [{ switch_index: 0, tube_index: 0 },{ switch_index: 0, tube_index: 2 }];
 
 init();
 animate();
@@ -101,13 +92,16 @@ function init() {
     line_mesh = new THREE.Group();
 
 
-    // 线路初始化
+    // 开关初始化
+    switches_mesh = new SwitchMesh(switch_mesh_inputs);
 
-    //开关初始化
-    line_mesh.add(swithes_mesh = new SwitchMesh(switch_mesh_inputs).init());
+    line_mesh.add(switches_mesh.render());
 
-    //管道初始化
-    line_mesh.add(tubes_mesh = new TubeMesh(tube_mesh_inputs).init());
+
+    // 管道初始化
+    tubes_mesh = new TubeMesh(tube_mesh_inputs, switch_mesh_inputs, swithes_tubes_relations);
+
+    line_mesh.add(tubes_mesh.render());
 
     all_mesh.add(line_mesh);
 
@@ -203,44 +197,20 @@ function onMouseDown(event) {
     if (intersection.length > 0) {
 
         const userData = intersection[0].object.userData;
+        
         if (userData.clickable) {
 
             const instanceId = intersection[0].instanceId;
 
             const tubeId = findRelatedTubes(instanceId);
 
-            isSwithOn = !isSwithOn;
+            if (tubeId != -1) {
 
-            swithes_mesh.getColorAt(instanceId, color);
+                switch_mesh_inputs[tubeId].isSwitchOn = !switch_mesh_inputs[tubeId].isSwitchOn;
 
-            if (isSwithOn == true) {
+                switches_mesh.rerender();
 
-                swithes_mesh.setColorAt(instanceId, red);
-
-                swithes_mesh.instanceColor.needsUpdate = true;
-
-
-                if (tubeId !== -1) {
-
-                    tubes_mesh.setColorAt(tubeId, white);
-
-                    tubes_mesh.instanceColor.needsUpdate = true;
-                }
-            }
-            else if (isSwithOn == false) {
-
-                swithes_mesh.setColorAt(instanceId, white);
-
-                swithes_mesh.instanceColor.needsUpdate = true;
-
-                if (tubeId !== -1) {
-
-                    tubes_mesh.setColorAt(tubeId, green);
-
-                    tubes_mesh.instanceColor.needsUpdate = true;
-                }
-
-
+                tubes_mesh.rerender();
             }
         }
 
