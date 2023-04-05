@@ -22,13 +22,26 @@ const mouse = new THREE.Vector2(1, 1);
 
 const white = COLOR.WHITE;
 
-const switch_mesh_inputs = [new SwitchMeshInputProps(0, 0, 0, null, null, true)];
-const tube_mesh_inputs = [
-    new LineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
-    new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0)
+// 输入
+
+//开关
+const switch_mesh_inputs = [
+    new SwitchMeshInputProps(0, 0, 0, null, null, true),
+    new SwitchMeshInputProps(0, 3, 0, null, null, false)
 ];
 
-const swithes_tubes_relations = [new SwitchTubeRelationProps(0, 0)];
+//管道
+const tube_mesh_inputs = [
+    new LineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
+    new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0),
+    new LineMeshInputProps(0, 5, 0, DIRECTION.X, 0),
+];
+
+//开关和管道的对应
+const swithes_tubes_relations = [
+    new SwitchTubeRelationProps(0, 0),
+    new SwitchTubeRelationProps(1, 2)
+];
 
 init();
 animate();
@@ -206,7 +219,7 @@ function onMouseDown(event) {
 
             if (tubeId != -1) {
 
-                switch_mesh_inputs[tubeId].isSwitchOn = !switch_mesh_inputs[tubeId].isSwitchOn;
+                switch_mesh_inputs[instanceId].isSwitchOn = !switch_mesh_inputs[instanceId].isSwitchOn;
 
                 switches_mesh.rerender();
 
