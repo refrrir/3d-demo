@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { SwitchMesh, TubeMesh } from '@objects';
-import { LineMeshInputProps, SwitchMeshInputProps } from '@models';
+import { LineMeshInputProps, SwitchMeshInputProps, SwitchTubeRelationProps } from '@models';
 import { COLOR, DIRECTION } from '@constants';
 
 
@@ -28,7 +28,7 @@ const tube_mesh_inputs = [
     new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0)
 ];
 
-const swithes_tubes_relations = [{ switch_index: 0, tube_index: 0 },{ switch_index: 0, tube_index: 2 }];
+const swithes_tubes_relations = [new SwitchTubeRelationProps(0, 0)];
 
 init();
 animate();
@@ -197,7 +197,7 @@ function onMouseDown(event) {
     if (intersection.length > 0) {
 
         const userData = intersection[0].object.userData;
-        
+
         if (userData.clickable) {
 
             const instanceId = intersection[0].instanceId;
