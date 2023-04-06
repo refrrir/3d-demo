@@ -6,4 +6,11 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  resolve: {
+    alias: {
+      "@constants": path.resolve(__dirname, "src/constants"),
+      "@objects": path.resolve(__dirname, "src/objects"),
+      "@models": path.resolve(__dirname, "src/models"),
+    }
+  }
 };

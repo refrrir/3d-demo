@@ -3,36 +3,45 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SwitchMesh, TubeMesh } from '@objects';
+import { LineMeshInputProps, SwitchMeshInputProps, SwitchTubeRelationProps } from '@models';
+import { COLOR, DIRECTION } from '@constants';
+
 
 let camera, scene, renderer, controls, stats;
 
-let swithes_mesh;
-let tubes_mesh;
-let line_mesh;
-let all_mesh;
+let switches_mesh; //开关
+let tubes_mesh; //管道
+let line_mesh; //线路 = 开关 + 管道
+let all_mesh; //开关 + 管道 + 外载模型 
 
 
 const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
 
-const color = new THREE.Color();
-const white = new THREE.Color().setHex(0xffffff);
-const red = new THREE.Color().setHex(0xff0000);
-const green = new THREE.Color().setHex(0x097969);
+const white = COLOR.WHITE;
 
-const directions = {
-    directions_x: new THREE.Vector3(1, 0, 0),
-    directions_y: new THREE.Vector3(0, 1, 0),
-    directions_z: new THREE.Vector3(0, 0, 1)
-};
+// 输入
 
-let isSwithOn = false;
-const sphere_positions = [{ x: 0, y: 0, z: 0 }];
-const cylinder_positions = [{ x: 0, y: 2, z: 0 }, { x: 0, y: 2, z: 0 }];
-const cylinder_rotations = [{ axis: directions.directions_z, degree: Math.PI * 0.5 }, { axis: directions.directions_x, degree: 0 }];
+//开关
+const switch_mesh_inputs = [
+    new SwitchMeshInputProps(0, 0, 0, null, null, true),
+    new SwitchMeshInputProps(0, 3, 0, null, null, false)
+];
 
-const swithes_tubes_relations = [{ switch_index: 0, tube_index: 0 }];
+//管道
+const tube_mesh_inputs = [
+    new LineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
+    new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0),
+    new LineMeshInputProps(0, 5, 0, DIRECTION.X, 0),
+];
+
+//开关和管道的对应
+const swithes_tubes_relations = [
+    new SwitchTubeRelationProps(0, 0),
+    new SwitchTubeRelationProps(1, 2)
+];
 
 init();
 animate();
@@ -92,45 +101,23 @@ function init() {
     scene.add(grid);
 
 
-    const sphere = new THREE.IcosahedronGeometry(0.8, 3);
-    const cylinder = new THREE.CylinderGeometry(0.5, 0.5, 3, 50);
-    const swithes_material = new THREE.MeshPhongMaterial({ color: white });
-    const cylinder_material = new THREE.MeshPhongMaterial({ color: white });
-
-
     all_mesh = new THREE.Group();
     line_mesh = new THREE.Group();
-    swithes_mesh = new THREE.InstancedMesh(sphere, swithes_material, sphere_positions.length);
 
-    for (let i = 0; i < sphere_positions.length; i++) {
-        const sphere_matrix = new THREE.Matrix4();
-        sphere_matrix.setPosition(sphere_positions[i].x, sphere_positions[i].y, sphere_positions[i].z);
 
-        swithes_mesh.setMatrixAt(i, sphere_matrix);
-        swithes_mesh.setColorAt(i, white);
-    }
+    // 开关初始化
+    switches_mesh = new SwitchMesh(switch_mesh_inputs);
 
-    swithes_mesh.castShadow = true;
-    swithes_mesh.userData.clickable = true;
+    line_mesh.add(switches_mesh.render());
 
-    line_mesh.add(swithes_mesh);
 
-    tubes_mesh = new THREE.InstancedMesh(cylinder, cylinder_material, cylinder_positions.length);
+    // 管道初始化
+    tubes_mesh = new TubeMesh(tube_mesh_inputs, switch_mesh_inputs, swithes_tubes_relations);
 
-    for (let i = 0; i < cylinder_positions.length; i++) {
-        const cylinder_matrix = new THREE.Matrix4();
-        cylinder_matrix.makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(cylinder_rotations[i].axis, cylinder_rotations[i].degree));
-        cylinder_matrix.multiply(new THREE.Matrix4().makeTranslation(cylinder_positions[i].x, cylinder_positions[i].y, cylinder_positions[i].z));
+    line_mesh.add(tubes_mesh.render());
 
-        tubes_mesh.setMatrixAt(i, cylinder_matrix);
-        tubes_mesh.setColorAt(i, green);
-    }
-
-    tubes_mesh.castShadow = true;
-    tubes_mesh.userData.clickable = false;
-
-    line_mesh.add(tubes_mesh);
     all_mesh.add(line_mesh);
+
     scene.add(all_mesh);
 
     loader.load(
@@ -166,7 +153,7 @@ function init() {
         }
     );
 
-    line_mesh.scale.set(0.2,0.2,0.2);
+    line_mesh.scale.set(0.2, 0.2, 0.2);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -223,44 +210,20 @@ function onMouseDown(event) {
     if (intersection.length > 0) {
 
         const userData = intersection[0].object.userData;
+
         if (userData.clickable) {
 
             const instanceId = intersection[0].instanceId;
 
             const tubeId = findRelatedTubes(instanceId);
 
-            isSwithOn = !isSwithOn;
+            if (tubeId != -1) {
 
-            swithes_mesh.getColorAt(instanceId, color);
+                switch_mesh_inputs[instanceId].isSwitchOn = !switch_mesh_inputs[instanceId].isSwitchOn;
 
-            if (isSwithOn == true) {
+                switches_mesh.rerender();
 
-                swithes_mesh.setColorAt(instanceId, red);
-
-                swithes_mesh.instanceColor.needsUpdate = true;
-
-
-                if (tubeId !== -1) {
-
-                    tubes_mesh.setColorAt(tubeId, white);
-
-                    tubes_mesh.instanceColor.needsUpdate = true;
-                }
-            }
-            else if (isSwithOn == false) {
-
-                swithes_mesh.setColorAt(instanceId, white);
-
-                swithes_mesh.instanceColor.needsUpdate = true;
-
-                if (tubeId !== -1) {
-
-                    tubes_mesh.setColorAt(tubeId, green);
-
-                    tubes_mesh.instanceColor.needsUpdate = true;
-                }
-
-
+                tubes_mesh.rerender();
             }
         }
 
