@@ -122,7 +122,7 @@ function init() {
 
     loader.load(
         // resource URL
-        '../models/3D_House_n.gltf',
+        '../models/3d_house.gltf',
         // called when the resource is loaded
         function (gltf) {
             gltf.scene.traverse(function (node) {
