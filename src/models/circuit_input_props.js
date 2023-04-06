@@ -1,5 +1,5 @@
 //考虑升级成tyescript项目
-class LineMeshInputProps {
+class CircuitMeshInputProps {
     position_x;
     position_y;
     position_z;
@@ -14,4 +14,4 @@ class LineMeshInputProps {
     }
 }
 
-export { LineMeshInputProps };
+export { CircuitMeshInputProps };

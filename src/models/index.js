@@ -1,9 +1,9 @@
-import { LineMeshInputProps } from "./line_input_props";
-import { SwitchMeshInputProps } from "./switch_input_props";
-import { SwitchTubeRelationProps } from "./switch_tube_relation_props";
+import { CircuitMeshInputProps } from "./circuit_input_props";
+import { ValveMeshInputProps } from "./valve_input_props";
+import { ValvePipelineRelationProps } from "./valve_pipeline_relation_props";
 
 export {
-    LineMeshInputProps,
-    SwitchMeshInputProps,
-    SwitchTubeRelationProps
+    CircuitMeshInputProps,
+    ValveMeshInputProps,
+    ValvePipelineRelationProps
 };
