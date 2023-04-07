@@ -1,4 +1,4 @@
-//考虑升级成tyescript项目
+//考虑升级成typescript项目
 class CircuitMeshInputProps {
     position_x;
     position_y;

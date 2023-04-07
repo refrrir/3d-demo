@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ValveMesh, PipelineMesh } from '@objects';
-import { CircuitMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
+import { PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
 import { COLOR, DIRECTION } from '@constants';
 
 
@@ -26,15 +26,15 @@ const white = COLOR.WHITE;
 
 //开关
 const valve_mesh_inputs = [
-    new ValveMeshInputProps(0, 0, 0, null, null, true),
-    new ValveMeshInputProps(0, 3, 0, null, null, false)
+    new ValveMeshInputProps(0, 0, 0, null, null, true, 1),
+    new ValveMeshInputProps(0, 3, 0, null, null, false, 1)
 ];
 
 //管道
 const pipeline_mesh_inputs = [
-    new CircuitMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
-    new CircuitMeshInputProps(0, 2, 0, DIRECTION.X, 0),
-    new CircuitMeshInputProps(0, 5, 0, DIRECTION.X, 0),
+    new PipelineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5, 1, 3),
+    new PipelineMeshInputProps(0, 2, 0, DIRECTION.X, 0, 1, 3),
+    new PipelineMeshInputProps(0, 5, 0, DIRECTION.X, 0, 1, 3),
 ];
 
 //开关和管道的对应

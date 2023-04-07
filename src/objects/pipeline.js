@@ -4,7 +4,7 @@ import { COLOR } from '@constants';
 class PipelineMesh {
 
     constructor(pipeline_mesh_input_props, valve_mesh_inputs, valves_pipelines_relations) {
-        const cylinder = new CylinderGeometry(0.5, 0.5, 3, 50);
+        const cylinder = new CylinderGeometry(0.5, 0.5, 1, 50);
         const cylinder_material = new MeshPhongMaterial({ color: COLOR.WHITE });
 
         this.pipeline_mesh_input_props = pipeline_mesh_input_props;
@@ -21,6 +21,7 @@ class PipelineMesh {
             const cylinder_matrix = new Matrix4();
             cylinder_matrix.makeRotationFromQuaternion(new Quaternion().setFromAxisAngle(pipeline_mesh_input_props[i].rotation_direction, pipeline_mesh_input_props[i].rotation_degree));
             cylinder_matrix.multiply(new Matrix4().makeTranslation(pipeline_mesh_input_props[i].position_x, pipeline_mesh_input_props[i].position_y, pipeline_mesh_input_props[i].position_z));
+            cylinder_matrix.multiply(new Matrix4().makeScale(pipeline_mesh_input_props[i].radius, pipeline_mesh_input_props[i].height, pipeline_mesh_input_props[i].radius));
 
             pipelines_mesh.setMatrixAt(i, cylinder_matrix);
             pipelines_mesh.setColorAt(i, COLOR.GREEN);
@@ -52,7 +53,7 @@ class PipelineMesh {
         }
     }
 
-    rerender(){
+    rerender() {
         this.render();
         this.pipelines_mesh.instanceColor.needsUpdate = true;
     }

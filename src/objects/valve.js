@@ -17,6 +17,7 @@ class ValveMesh {
         for (let i = 0; i < valve_mesh_input_props.length; i++) {
             const sphere_matrix = new Matrix4();
             sphere_matrix.setPosition(valve_mesh_input_props[i].position_x, valve_mesh_input_props[i].position_y, valve_mesh_input_props[i].position_z);
+            sphere_matrix.multiply(new Matrix4().makeScale(valve_mesh_input_props[i].radius, valve_mesh_input_props[i].radius, valve_mesh_input_props[i].radius));
             valves_mesh.setMatrixAt(i, sphere_matrix);
             valves_mesh.setColorAt(
                 i,
