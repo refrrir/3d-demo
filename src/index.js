@@ -3,16 +3,16 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { SwitchMesh, TubeMesh } from '@objects';
-import { LineMeshInputProps, SwitchMeshInputProps, SwitchTubeRelationProps } from '@models';
+import { ValveMesh, PipelineMesh } from '@objects';
+import { PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
 import { COLOR, DIRECTION } from '@constants';
 
 
 let camera, scene, renderer, controls, stats;
 
-let switches_mesh; //开关
-let tubes_mesh; //管道
-let line_mesh; //线路 = 开关 + 管道
+let valves_mesh; //开关
+let pipelines_mesh; //管道
+let circuit_mesh; //线路 = 开关 + 管道
 let all_mesh; //开关 + 管道 + 外载模型 
 
 
@@ -25,22 +25,22 @@ const white = COLOR.WHITE;
 // 输入
 
 //开关
-const switch_mesh_inputs = [
-    new SwitchMeshInputProps(0, 0, 0, null, null, true),
-    new SwitchMeshInputProps(0, 3, 0, null, null, false)
+const valve_mesh_inputs = [
+    new ValveMeshInputProps(0, 0, 0, null, null, true, 1),
+    new ValveMeshInputProps(0, 3, 0, null, null, false, 1)
 ];
 
 //管道
-const tube_mesh_inputs = [
-    new LineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5),
-    new LineMeshInputProps(0, 2, 0, DIRECTION.X, 0),
-    new LineMeshInputProps(0, 5, 0, DIRECTION.X, 0),
+const pipeline_mesh_inputs = [
+    new PipelineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5, 1, 3),
+    new PipelineMeshInputProps(0, 2, 0, DIRECTION.X, 0, 1, 3),
+    new PipelineMeshInputProps(0, 5, 0, DIRECTION.X, 0, 1, 3),
 ];
 
 //开关和管道的对应
-const swithes_tubes_relations = [
-    new SwitchTubeRelationProps(0, 0),
-    new SwitchTubeRelationProps(1, 2)
+const valves_pipelines_relations = [
+    new ValvePipelineRelationProps(0, 0),
+    new ValvePipelineRelationProps(1, 2)
 ];
 
 init();
@@ -102,27 +102,27 @@ function init() {
 
 
     all_mesh = new THREE.Group();
-    line_mesh = new THREE.Group();
+    circuit_mesh = new THREE.Group();
 
 
     // 开关初始化
-    switches_mesh = new SwitchMesh(switch_mesh_inputs);
+    valves_mesh = new ValveMesh(valve_mesh_inputs);
 
-    line_mesh.add(switches_mesh.render());
+    circuit_mesh.add(valves_mesh.render());
 
 
     // 管道初始化
-    tubes_mesh = new TubeMesh(tube_mesh_inputs, switch_mesh_inputs, swithes_tubes_relations);
+    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, valve_mesh_inputs, valves_pipelines_relations);
 
-    line_mesh.add(tubes_mesh.render());
+    circuit_mesh.add(pipelines_mesh.render());
 
-    all_mesh.add(line_mesh);
+    all_mesh.add(circuit_mesh);
 
     scene.add(all_mesh);
 
     loader.load(
         // resource URL
-        '../models/3D_House_n.gltf',
+        '../models/3d_house.gltf',
         // called when the resource is loaded
         function (gltf) {
             gltf.scene.traverse(function (node) {
@@ -153,7 +153,7 @@ function init() {
         }
     );
 
-    line_mesh.scale.set(0.2, 0.2, 0.2);
+    circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -215,15 +215,15 @@ function onMouseDown(event) {
 
             const instanceId = intersection[0].instanceId;
 
-            const tubeId = findRelatedTubes(instanceId);
+            const pipelineId = findRelatedPipelines(instanceId);
 
-            if (tubeId != -1) {
+            if (pipelineId != -1) {
 
-                switch_mesh_inputs[instanceId].isSwitchOn = !switch_mesh_inputs[instanceId].isSwitchOn;
+                valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
 
-                switches_mesh.rerender();
+                valves_mesh.rerender();
 
-                tubes_mesh.rerender();
+                pipelines_mesh.rerender();
             }
         }
 
@@ -231,12 +231,12 @@ function onMouseDown(event) {
 
 }
 
-function findRelatedTubes(switchIndex) {
+function findRelatedPipelines(valveIndex) {
 
-    for (const relation of swithes_tubes_relations) {
+    for (const relation of valves_pipelines_relations) {
 
-        if (relation.switch_index === switchIndex) {
-            return relation.tube_index;
+        if (relation.valve_index === valveIndex) {
+            return relation.pipeline_index;
         }
     }
 

@@ -1,7 +1,7 @@
-import { SwitchMesh } from "./switch";
-import { TubeMesh } from "./tube"; 
+import { ValveMesh } from "./valve";
+import { PipelineMesh } from "./pipeline"; 
 
 export {
-    SwitchMesh,
-    TubeMesh
+    ValveMesh,
+    PipelineMesh
 }
