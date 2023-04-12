@@ -18,4 +18,13 @@ module.exports = {
       directory: path.join(__dirname, "static"),
     },
   },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: "/node-modules/",
+      },
+    ],
+  },
 };
