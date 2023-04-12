@@ -7,6 +7,45 @@ import { ValveMesh, PipelineMesh } from '@objects';
 import { PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
 import { COLOR, DIRECTION } from '@constants';
 
+// panel example
+import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
+
+function removeList(checked) {
+    if (!checked) removeListItems();
+} // For test
+function changeValveColor(checked) {
+    if (checked) console.log("Valve => yellow");
+    else console.log("Valve => gray");
+} // Callback function
+const valve_propertys = [
+    { name: "ID", value: "99001-765-M" },
+    { name: "Name", value: "main valve" },
+    { name: "Location", value: "kitchen" },
+    { name: "Type", value: "solenoid valve" },
+    { name: "Model", value: "JKB-V2-DN150" },
+]; // From entity.propertys
+
+let valveStatus = true // From entity.isSwitchOn
+let pressure = 390.5 // From sensor
+let propertys = [
+    ...valve_propertys,
+    ...[
+      { name: "Valve status", value: valveStatus },
+      { name: "Presure", value: `${pressure} Pascal`},
+      { name: "testRemoveList", value: false },
+    ],
+];
+for (const property of propertys) {
+    if (typeof property.value == "string")
+        insertTextList(property.name, property.value);
+    else if (typeof property.value === "boolean")
+        insertCheckboxList(
+            property.name,
+            property.value,
+            property.name === "testRemoveList" ? removeList : changeValveColor
+        );
+}
+// End
 
 let camera, scene, renderer, controls, stats;
 

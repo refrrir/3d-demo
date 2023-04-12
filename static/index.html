@@ -2,10 +2,36 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Getting Started</title>
+    <title>3D demo</title>
+
+    <link href="sytle.css" type="text/css" rel="stylesheet" />
+    <link href="switch.css" type="text/css" rel="stylesheet" />
+
+    <template id="text-li">
+      <li class="list-item">
+        <span class="property-name"></span>
+        <div class="property-value">
+          <input type="text" class="text-style" />
+        </div>
+      </li>
+    </template>
+    <template id="checkbox-li">
+      <li class="list-item">
+        <span class="property-name"></span>
+        <div class="property-value">
+          <input type="checkbox" class="checkbox-switch" />
+        </div>
+      </li>
+    </template>
   </head>
+
   <body>
-    <div id="container"></div>
+    <div id="container">
+      <div class="panel-list" id="panel">
+        <ul></ul>
+      </div>
+    </div>
+
     <script src="main.js"></script>
   </body>
 </html>

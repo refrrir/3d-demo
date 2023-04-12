@@ -1,0 +1,49 @@
+.panel-list {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 0;
+  font: 11px Lucida Grande, sans-serif;
+  width: 280px;
+  float: right;
+  margin-right: 3px;
+  overflow-x: hidden;
+  opacity: 0.7;
+}
+.list-item {
+  border-left: 3px solid #2fa1d6;
+  cursor: auto;
+  height: 27px;
+  line-height: 27px;
+  overflow: hidden;
+  padding: 0 4px 0 5px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2c2c2c;
+  color: #eee;
+}
+.property-name {
+  float: left;
+  width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.property-value {
+  float: left;
+  width: 60%;
+}
+.text-style {
+  border: 0;
+  margin-top: 4px;
+  padding: 3px;
+  width: 100%;
+  float: right;
+  color: #2fa1d6;
+  background: #303030;
+}
+.checkbox-style {
+  border: 0;
+  margin-top: 7px;
+  padding: 3px;
+  color: #2fa1d6;
+  background: #303030;
+}

@@ -1,0 +1,30 @@
+input[type="checkbox"].checkbox-switch {
+  margin-top: 8px;
+  appearance: none;
+  position: relative;
+  width: 28px;
+  height: 12px;
+  background: grey;
+  border-radius: 6px;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+input[type="checkbox"].checkbox-switch::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: 2px;
+  left: 3px;
+  border-radius: 50%;
+  background: #eee;
+  transition: 0.4s;
+}
+input[type="checkbox"].checkbox-switch:checked {
+  background: #2fa1d6;
+}
+input[type="checkbox"].checkbox-switch:checked::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 60%;
+}
