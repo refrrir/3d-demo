@@ -4,7 +4,6 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ValveMesh, PipelineMesh } from '@objects';
-import { PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
 import { COLOR, DIRECTION } from '@constants';
 
 // panel example
@@ -30,9 +29,9 @@ let pressure = 390.5 // From sensor
 let propertys = [
     ...valve_propertys,
     ...[
-      { name: "Valve status", value: valveStatus },
-      { name: "Presure", value: `${pressure} Pascal`},
-      { name: "testRemoveList", value: false },
+        { name: "Valve status", value: valveStatus },
+        { name: "Presure", value: `${pressure} Pascal` },
+        { name: "testRemoveList", value: false },
     ],
 ];
 for (const property of propertys) {
@@ -65,21 +64,21 @@ const white = COLOR.WHITE;
 
 //开关
 const valve_mesh_inputs = [
-    new ValveMeshInputProps(0, 0, 0, null, null, true, 1),
-    new ValveMeshInputProps(0, 3, 0, null, null, false, 1)
+    { position_x: 0, position_y: 0, position_z: 0, isValveOn: true, radius: 1},
+    { position_x: 0, position_y: 3, position_z: 0, isValveOn: false, radius: 1},
 ];
 
 //管道
 const pipeline_mesh_inputs = [
-    new PipelineMeshInputProps(0, 2, 0, DIRECTION.Z, Math.PI * 0.5, 1, 3),
-    new PipelineMeshInputProps(0, 2, 0, DIRECTION.X, 0, 1, 3),
-    new PipelineMeshInputProps(0, 5, 0, DIRECTION.X, 0, 1, 3),
+    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.Z, rotation_degree: Math.PI * 0.5, radius: 1, height: 3},
+    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3},
+    { position_x: 0, position_y: 5, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3},
 ];
 
 //开关和管道的对应
 const valves_pipelines_relations = [
-    new ValvePipelineRelationProps(0, 0),
-    new ValvePipelineRelationProps(1, 2)
+    {valve_index:0, pipeline_index: 0},
+    {valve_index:1, pipeline_index: 2},
 ];
 
 init();

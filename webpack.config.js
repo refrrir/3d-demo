@@ -12,6 +12,7 @@ module.exports = {
       "@objects": path.resolve(__dirname, "src/objects"),
       "@models": path.resolve(__dirname, "src/models"),
     },
+    extensions: ['.ts', '.js']
   },
   devServer: {
     static: {
