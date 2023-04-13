@@ -3,50 +3,51 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import GUI from 'lil-gui';
 import { ValveMesh, PipelineMesh } from '@objects';
 import { COLOR, DIRECTION } from '@constants';
 
 // panel example
-import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
+// import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
 
-function removeList(checked) {
-    if (!checked) removeListItems();
-} // For test
-function changeValveColor(checked) {
-    if (checked) console.log("Valve => yellow");
-    else console.log("Valve => gray");
-} // Callback function
-const valve_propertys = [
-    { name: "ID", value: "99001-765-M" },
-    { name: "Name", value: "main valve" },
-    { name: "Location", value: "kitchen" },
-    { name: "Type", value: "solenoid valve" },
-    { name: "Model", value: "JKB-V2-DN150" },
-]; // From entity.propertys
+// function removeList(checked) {
+//     if (!checked) removeListItems();
+// } // For test
+// function changeValveColor(checked) {
+//     if (checked) console.log("Valve => yellow");
+//     else console.log("Valve => gray");
+// } // Callback function
+// const valve_properties = [
+//     { name: "ID", value: "99001-765-M" },
+//     { name: "Name", value: "main valve" },
+//     { name: "Location", value: "kitchen" },
+//     { name: "Type", value: "solenoid valve" },
+//     { name: "Model", value: "JKB-V2-DN150" },
+// ]; // From entity.properties
 
-let valveStatus = true // From entity.isSwitchOn
-let pressure = 390.5 // From sensor
-let propertys = [
-    ...valve_propertys,
-    ...[
-        { name: "Valve status", value: valveStatus },
-        { name: "Presure", value: `${pressure} Pascal` },
-        { name: "testRemoveList", value: false },
-    ],
-];
-for (const property of propertys) {
-    if (typeof property.value == "string")
-        insertTextList(property.name, property.value);
-    else if (typeof property.value === "boolean")
-        insertCheckboxList(
-            property.name,
-            property.value,
-            property.name === "testRemoveList" ? removeList : changeValveColor
-        );
-}
+// let valveStatus = true // From entity.isSwitchOn
+// let pressure = 390.5 // From sensor
+// let properties = [
+//     ...valve_properties,
+//     ...[
+//         { name: "Valve status", value: valveStatus },
+//         { name: "Presure", value: `${pressure} Pascal` },
+//         { name: "testRemoveList", value: false },
+//     ],
+// ];
+// for (const property of properties) {
+//     if (typeof property.value == "string")
+//         insertTextList(property.name, property.value);
+//     else if (typeof property.value === "boolean")
+//         insertCheckboxList(
+//             property.name,
+//             property.value,
+//             property.name === "testRemoveList" ? removeList : changeValveColor
+//         );
+// }
 // End
 
-let camera, scene, renderer, controls, stats;
+let camera, scene, renderer, controls, stats, gui;
 
 let valves_mesh; //开关
 let pipelines_mesh; //管道
@@ -64,21 +65,31 @@ const white = COLOR.WHITE;
 
 //开关
 const valve_mesh_inputs = [
-    { position_x: 0, position_y: 0, position_z: 0, isValveOn: true, radius: 1},
-    { position_x: 0, position_y: 3, position_z: 0, isValveOn: false, radius: 1},
+    {
+        position_x: 0, position_y: 0, position_z: 0, isValveOn: false, radius: 1,
+        information:
+            [
+                { name: "ID", value: "99001-765-M" },
+                { name: "Name", value: "main valve" },
+                { name: "Location", value: "kitchen" },
+                { name: "Type", value: "solenoid valve" },
+                { name: "Model", value: "JKB-V2-DN150" },
+            ]
+    },
+    { position_x: 0, position_y: 3, position_z: 0, isValveOn: true, radius: 1 },
 ];
 
 //管道
 const pipeline_mesh_inputs = [
-    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.Z, rotation_degree: Math.PI * 0.5, radius: 1, height: 3},
-    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3},
-    { position_x: 0, position_y: 5, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3},
+    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.Z, rotation_degree: Math.PI * 0.5, radius: 1, height: 3 },
+    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3 },
+    { position_x: 0, position_y: 5, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3 },
 ];
 
 //开关和管道的对应
 const valves_pipelines_relations = [
-    {valve_index:0, pipeline_index: 0},
-    {valve_index:1, pipeline_index: 2},
+    { valve_index: 0, pipeline_index: 0 },
+    { valve_index: 1, pipeline_index: 2 },
 ];
 
 init();
@@ -220,6 +231,8 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
 
+    gui = new GUI();
+
     window.addEventListener('resize', onWindowResize);
     document.addEventListener('mousedown', onMouseDown);
 
@@ -253,15 +266,36 @@ function onMouseDown(event) {
 
             const instanceId = intersection[0].instanceId;
 
+            gui.destroy();
+            gui = new GUI();
+
+            let obj = {};
+
+            valve_mesh_inputs[instanceId].information?.map(info => {
+                obj[info.name] = info.value;
+            })
+
+            obj.valveStatus = valve_mesh_inputs[instanceId].isValveOn;
+
+            for (const key in obj) {
+                gui.add(obj, key);
+            }
+
             const pipelineId = findRelatedPipelines(instanceId);
 
             if (pipelineId != -1) {
 
-                valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
+                gui.onChange(event => {
 
-                valves_mesh.rerender();
+                    if (event.property == 'valveStatus') {
 
-                pipelines_mesh.rerender();
+                        valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
+
+                        valves_mesh.rerender();
+                        pipelines_mesh.rerender();
+                    }
+                });
+
             }
         }
 

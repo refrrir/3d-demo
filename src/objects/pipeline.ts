@@ -51,9 +51,9 @@ class PipelineMesh {
 
             if (valve_index >= 0 && valve_index < this.valve_mesh_inputs.length && pipeline_index >= 0 && pipeline_index < this.pipeline_mesh_input_props.length) {
                 if (this.valve_mesh_inputs[valve_index].isValveOn) {
-                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.WHITE);
-                } else {
                     this.pipelines_mesh.setColorAt(pipeline_index, COLOR.GREEN);
+                } else {
+                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.WHITE);
                 }
             }
         }

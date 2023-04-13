@@ -26,8 +26,8 @@ class ValveMesh {
             valves_mesh.setColorAt(
                 i,
                 valve_mesh_input_props[i].isValveOn
-                    ? COLOR.RED
-                    : COLOR.WHITE
+                    ? COLOR.WHITE
+                    : COLOR.RED
             );
         }
 
