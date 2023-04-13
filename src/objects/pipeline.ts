@@ -1,9 +1,15 @@
 import { InstancedMesh, Matrix4, CylinderGeometry, MeshPhongMaterial, Quaternion } from 'three';
+import { PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from '@models';
 import { COLOR } from '@constants';
 
 class PipelineMesh {
 
-    constructor(pipeline_mesh_input_props, valve_mesh_inputs, valves_pipelines_relations) {
+    pipeline_mesh_input_props;
+    valve_mesh_inputs;
+    valves_pipelines_relations;
+    pipelines_mesh
+
+    constructor(pipeline_mesh_input_props: PipelineMeshInputProps[], valve_mesh_inputs: ValveMeshInputProps[], valves_pipelines_relations: ValvePipelineRelationProps[]) {
         const cylinder = new CylinderGeometry(0.5, 0.5, 1, 50);
         const cylinder_material = new MeshPhongMaterial({ color: COLOR.WHITE });
 

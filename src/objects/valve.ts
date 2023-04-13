@@ -1,9 +1,13 @@
 import { InstancedMesh, Matrix4, IcosahedronGeometry, MeshPhongMaterial } from 'three';
+import { ValveMeshInputProps } from '@models';
 import { COLOR } from '@constants';
 
 class ValveMesh {
 
-    constructor(valve_mesh_input_props) {
+    valve_mesh_input_props;
+    valves_mesh
+
+    constructor(valve_mesh_input_props: ValveMeshInputProps[]) {
         const sphere = new IcosahedronGeometry(0.8, 3);
         const valves_material = new MeshPhongMaterial({ color: COLOR.WHITE });
 
