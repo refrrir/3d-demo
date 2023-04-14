@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import GUI from 'lil-gui';
+import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh } from '@objects';
 import { COLOR, DIRECTION } from '@constants';
 
@@ -231,10 +231,12 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
 
-    gui = new GUI();
+    gui = new GUIPanel('gui-container');
+    gui.init();
+
 
     window.addEventListener('resize', onWindowResize);
-    document.addEventListener('mousedown', onMouseDown);
+    document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onClick);
 
 }
 
@@ -247,9 +249,7 @@ function onWindowResize() {
 
 }
 
-function onMouseDown(event) {
-
-    event.preventDefault();
+function onClick(event) {
 
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -266,35 +266,17 @@ function onMouseDown(event) {
 
             const instanceId = intersection[0].instanceId;
 
-            gui.destroy();
-            gui = new GUI();
-
-            let obj = {};
-
-            valve_mesh_inputs[instanceId].information?.map(info => {
-                obj[info.name] = info.value;
-            })
-
-            obj.valveStatus = valve_mesh_inputs[instanceId].isValveOn;
-
-            for (const key in obj) {
-                gui.add(obj, key);
-            }
+            gui.populateInfo(valve_mesh_inputs[instanceId].isValveOn, valve_mesh_inputs[instanceId].information)
 
             const pipelineId = findRelatedPipelines(instanceId);
 
             if (pipelineId != -1) {
 
-                gui.onChange(event => {
-
-                    if (event.property == 'valveStatus') {
-
-                        valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
-
-                        valves_mesh.rerender();
-                        pipelines_mesh.rerender();
-                    }
-                });
+                gui.onValveStatusUpdate(() => {
+                    valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
+                    valves_mesh.rerender();
+                    pipelines_mesh.rerender();
+                })
 
             }
         }

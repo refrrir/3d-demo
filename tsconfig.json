@@ -13,6 +13,9 @@
       "@models": [
         "./models",
       ],
+      "@components": [
+        "./component",
+      ],
     }
   }
 }

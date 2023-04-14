@@ -17,4 +17,4 @@ interface CircuitMeshInputProps {
 
 }
 
-export { CircuitMeshInputProps };
+export { CircuitMeshInputProps, Information};
