@@ -15,7 +15,7 @@ class GUIPanel {
         this.guiContainer && this.dragElement(this.guiContainer);
     }
 
-    populateInfo(isValveOn: boolean, info?: Information[]) {
+    populateInfo(info: Information[] | undefined, isValveOn?: boolean) {
         this.gui.destroy();
         this.gui = new GUI({ container: this.guiContainer });
         this.guiContainer && this.dragElement(this.guiContainer);
@@ -27,7 +27,7 @@ class GUIPanel {
             obj[i.name] = i.value;
         }))
 
-        obj.valveStatus = isValveOn;
+        isValveOn != undefined && (obj.valveStatus = isValveOn);
 
         for (const key in obj) {
             this.gui.add(obj, key);
