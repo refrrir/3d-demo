@@ -11,6 +11,8 @@ module.exports = {
       "@constants": path.resolve(__dirname, "src/constants"),
       "@objects": path.resolve(__dirname, "src/objects"),
       "@models": path.resolve(__dirname, "src/models"),
+      "@components": path.resolve(__dirname, "src/component"),
+      "@utils": path.resolve(__dirname, "src/utils"),
     },
     extensions: ['.ts', '.js']
   },

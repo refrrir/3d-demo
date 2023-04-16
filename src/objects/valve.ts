@@ -5,14 +5,16 @@ import { COLOR } from '@constants';
 class ValveMesh {
 
     valve_mesh_input_props;
-    valves_mesh
+    valves_mesh;
+    onClick;
 
-    constructor(valve_mesh_input_props: ValveMeshInputProps[]) {
+    constructor(valve_mesh_input_props: ValveMeshInputProps[], onClickEvent?: (index: number) => void) {
         const sphere = new IcosahedronGeometry(0.8, 3);
         const valves_material = new MeshPhongMaterial({ color: COLOR.WHITE });
 
         this.valve_mesh_input_props = valve_mesh_input_props;
         this.valves_mesh = new InstancedMesh(sphere, valves_material, valve_mesh_input_props.length);
+        this.onClick = onClickEvent;
     }
 
     render() {
@@ -29,10 +31,12 @@ class ValveMesh {
                     ? COLOR.WHITE
                     : COLOR.RED
             );
+            this.onClick && (valve_mesh_input_props[i].clickable = true);
+            valve_mesh_input_props[i].onClickEvent = () => this.onClick && this.onClick(i);
         }
 
         valves_mesh.castShadow = true;
-        valves_mesh.userData.clickable = true;
+        valves_mesh.userData.isVavleMesh = true;
         return valves_mesh;
     }
 

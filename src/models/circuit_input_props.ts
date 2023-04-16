@@ -14,7 +14,9 @@ interface CircuitMeshInputProps {
     rotation_direction?: typeof Vector3;
     rotation_degree?: number;
     informations?: Information[];
+    clickable?: boolean;
+    onClickEvent?: () => void;
 
 }
 
-export { CircuitMeshInputProps };
+export { CircuitMeshInputProps, Information};

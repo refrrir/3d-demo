@@ -3,9 +3,10 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import GUI from 'lil-gui';
+import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh } from '@objects';
 import { COLOR, DIRECTION } from '@constants';
+import { Utils } from '@utils';
 
 // panel example
 // import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
@@ -59,8 +60,6 @@ const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
 
-const white = COLOR.WHITE;
-
 // 输入
 
 //开关
@@ -81,7 +80,14 @@ const valve_mesh_inputs = [
 
 //管道
 const pipeline_mesh_inputs = [
-    { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.Z, rotation_degree: Math.PI * 0.5, radius: 1, height: 3 },
+    {
+        position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.Z, rotation_degree: Math.PI * 0.5, radius: 1, height: 3,
+        information:
+            [
+                { name: "ID", value: "99001-765-P" },
+                { name: "Name", value: "main pipeline" },
+            ]
+    },
     { position_x: 0, position_y: 2, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3 },
     { position_x: 0, position_y: 5, position_z: 0, rotation_direction: DIRECTION.X, rotation_degree: 0, radius: 1, height: 3 },
 ];
@@ -129,7 +135,7 @@ function init() {
     // GROUND
 
     const geometry = new THREE.PlaneGeometry(100, 100);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: white });
+    const planeMaterial = new THREE.MeshPhongMaterial({ color: COLOR.WHITE });
 
     const ground = new THREE.Mesh(geometry, planeMaterial);
 
@@ -155,13 +161,13 @@ function init() {
 
 
     // 开关初始化
-    valves_mesh = new ValveMesh(valve_mesh_inputs);
+    valves_mesh = new ValveMesh(valve_mesh_inputs, onValveClick);
 
     circuit_mesh.add(valves_mesh.render());
 
 
     // 管道初始化
-    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, valve_mesh_inputs, valves_pipelines_relations);
+    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, valve_mesh_inputs, valves_pipelines_relations, onPipelineClick);
 
     circuit_mesh.add(pipelines_mesh.render());
 
@@ -231,10 +237,12 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
 
-    gui = new GUI();
+    gui = new GUIPanel('gui-container');
+    gui.init();
+
 
     window.addEventListener('resize', onWindowResize);
-    document.addEventListener('mousedown', onMouseDown);
+    document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onGlobalClick);
 
 }
 
@@ -247,9 +255,7 @@ function onWindowResize() {
 
 }
 
-function onMouseDown(event) {
-
-    event.preventDefault();
+function onGlobalClick(event) {
 
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -260,59 +266,30 @@ function onMouseDown(event) {
 
     if (intersection.length > 0) {
 
-        const userData = intersection[0].object.userData;
-
-        if (userData.clickable) {
+        if (intersection[0].object.userData.isVavleMesh) {
 
             const instanceId = intersection[0].instanceId;
 
-            gui.destroy();
-            gui = new GUI();
+            if (valve_mesh_inputs[instanceId].clickable) {
 
-            let obj = {};
-
-            valve_mesh_inputs[instanceId].information?.map(info => {
-                obj[info.name] = info.value;
-            })
-
-            obj.valveStatus = valve_mesh_inputs[instanceId].isValveOn;
-
-            for (const key in obj) {
-                gui.add(obj, key);
+                valve_mesh_inputs[instanceId].onClickEvent();
             }
 
-            const pipelineId = findRelatedPipelines(instanceId);
+        }
+        
+        if (intersection[0].object.userData.isPipelineMesh) {
 
-            if (pipelineId != -1) {
+            const instanceId = intersection[0].instanceId;
 
-                gui.onChange(event => {
+            if (pipeline_mesh_inputs[instanceId].clickable) {
 
-                    if (event.property == 'valveStatus') {
-
-                        valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
-
-                        valves_mesh.rerender();
-                        pipelines_mesh.rerender();
-                    }
-                });
-
+                pipeline_mesh_inputs[instanceId].onClickEvent();
             }
+
         }
 
     }
 
-}
-
-function findRelatedPipelines(valveIndex) {
-
-    for (const relation of valves_pipelines_relations) {
-
-        if (relation.valve_index === valveIndex) {
-            return relation.pipeline_index;
-        }
-    }
-
-    return -1;
 }
 
 
@@ -335,4 +312,25 @@ function render() {
 
     renderer.render(scene, camera);
 
+}
+
+function onValveClick(instanceId) {
+
+    gui.populateInfo(valve_mesh_inputs[instanceId].information, valve_mesh_inputs[instanceId].isValveOn)
+
+    const pipelineId = Utils.findRelatedPipelines(valves_pipelines_relations, instanceId);
+
+    if (pipelineId != -1) {
+
+        gui.onValveStatusUpdate(() => {
+            valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
+            valves_mesh.rerender();
+            pipelines_mesh.rerender();
+        })
+
+    }
+}
+
+function onPipelineClick(instanceId){
+    gui.populateInfo(pipeline_mesh_inputs[instanceId].information);
 }
