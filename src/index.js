@@ -238,7 +238,6 @@ function init() {
     document.body.appendChild(stats.dom);
 
     gui = new GUIPanel('gui-container');
-    gui.init();
 
 
     window.addEventListener('resize', onWindowResize);
