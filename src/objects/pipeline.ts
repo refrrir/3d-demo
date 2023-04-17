@@ -12,7 +12,7 @@ class PipelineMesh {
 
     constructor(pipeline_mesh_input_props: PipelineMeshInputProps[], valve_mesh_inputs: ValveMeshInputProps[], valves_pipelines_relations: ValvePipelineRelationProps[], onClickEvent?: (index:number) => void) {
         const cylinder = new CylinderGeometry(0.5, 0.5, 1, 50);
-        const cylinder_material = new MeshPhongMaterial({ color: COLOR.WHITE });
+        const cylinder_material = new MeshPhongMaterial({ color: COLOR.GREY });
 
         this.pipeline_mesh_input_props = pipeline_mesh_input_props;
         this.valve_mesh_inputs = valve_mesh_inputs;
@@ -32,7 +32,7 @@ class PipelineMesh {
             cylinder_matrix.multiply(new Matrix4().makeScale(pipeline_mesh_input_props[i].radius, pipeline_mesh_input_props[i].height, pipeline_mesh_input_props[i].radius));
 
             pipelines_mesh.setMatrixAt(i, cylinder_matrix);
-            pipelines_mesh.setColorAt(i, COLOR.GREEN);
+            pipelines_mesh.setColorAt(i, COLOR.YELLOW);
             this.onClick && (pipeline_mesh_input_props[i].clickable = true);
             pipeline_mesh_input_props[i].onClickEvent = () => this.onClick && this.onClick(i);
         }
@@ -55,9 +55,9 @@ class PipelineMesh {
 
             if (valve_index >= 0 && valve_index < this.valve_mesh_inputs.length && pipeline_index >= 0 && pipeline_index < this.pipeline_mesh_input_props.length) {
                 if (this.valve_mesh_inputs[valve_index].isValveOn) {
-                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.GREEN);
+                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.YELLOW);
                 } else {
-                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.WHITE);
+                    this.pipelines_mesh.setColorAt(pipeline_index, COLOR.GREY);
                 }
             }
         }
