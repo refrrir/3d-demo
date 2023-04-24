@@ -7,6 +7,8 @@ import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh } from '@objects';
 import { COLOR, DIRECTION } from '@constants';
 import { Utils } from '@utils';
+import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
 
 // panel example
 // import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
@@ -54,6 +56,11 @@ let valves_mesh; //开关
 let pipelines_mesh; //管道
 let circuit_mesh; //线路 = 开关 + 管道
 let all_mesh; //开关 + 管道 + 外载模型 
+
+let particles;
+let intersects;
+let INTERSECTED;
+const PARTICLE_SIZE = 1;
 
 
 const loader = new GLTFLoader();
@@ -362,10 +369,72 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
 
+    let boxGeometryArray = [];
+
+    let n = 4;
+    let s = 10;
+    let index = 0;
+
+    while (s > 0) {
+
+        let l = n * s;
+
+        let boxGeometry = new THREE.BoxGeometry(l, l, l, s, s, s);
+
+        boxGeometry.deleteAttribute('normal');
+        boxGeometry.deleteAttribute('uv');
+
+        boxGeometryArray[index++] = boxGeometry;
+
+        s--;
+
+    }
+
+    let boxGeometryAll = mergeBufferGeometries(boxGeometryArray, true);
+
+
+    const positionAttribute = boxGeometryAll.getAttribute('position');
+
+    const colors = [];
+    const sizes = [];
+
+    const color = new THREE.Color();
+
+    for (let i = 0, l = positionAttribute.count; i < l; i++) {
+
+        color.setHSL(0.01 + 0.1 * (i / l), 1.0, 0.5);
+        color.toArray(colors, i * 3);
+
+        sizes[i] = PARTICLE_SIZE * 0.5;
+
+    }
+
+    const vertices_geometry = new THREE.BufferGeometry();
+    vertices_geometry.setAttribute('position', positionAttribute);
+    vertices_geometry.setAttribute('customColor', new THREE.Float32BufferAttribute(colors, 3));
+    vertices_geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+
+
+    const material = new THREE.ShaderMaterial({
+
+        uniforms: {
+            color: { value: new THREE.Color(0xffffff) },
+            pointTexture: { value: new THREE.TextureLoader().load('../disc.png') },
+            alphaTest: { value: 0.9 }
+        },
+        vertexShader: document.getElementById('vertexshader').textContent,
+        fragmentShader: document.getElementById('fragmentshader').textContent
+
+    });
+
+    particles = new THREE.Points(vertices_geometry, material);
+
+    scene.add(particles);
+
     gui = new GUIPanel('gui-container');
 
-
     window.addEventListener('resize', onWindowResize);
+    document.addEventListener('pointermove', onPointerMove);
     document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onGlobalClick);
 
 }
@@ -379,10 +448,7 @@ function onWindowResize() {
 
 }
 
-function onGlobalClick(event) {
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+function onGlobalClick() {
 
     raycaster.setFromCamera(mouse, camera);
 
@@ -400,7 +466,7 @@ function onGlobalClick(event) {
             }
 
         }
-        
+
         if (intersection[0].object.userData.isPipelineMesh) {
 
             const instanceId = intersection[0].instanceId;
@@ -416,7 +482,12 @@ function onGlobalClick(event) {
 
 }
 
+function onPointerMove(event) {
 
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+}
 
 function animate() {
 
@@ -433,6 +504,36 @@ function animate() {
 }
 
 function render() {
+
+
+    const geometry = particles.geometry;
+    const attributes = geometry.attributes;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    intersects = raycaster.intersectObject(particles);
+
+    if (intersects.length > 0) {
+
+        if (INTERSECTED != intersects[0].index) {
+
+            attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 0.5;
+
+            INTERSECTED = intersects[0].index;
+
+            attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 5;
+            attributes.size.needsUpdate = true;
+
+            console.log(attributes.position.getX(INTERSECTED) + " " + attributes.position.getY(INTERSECTED) + " " + attributes.position.getZ(INTERSECTED));
+        }
+
+    } else if (INTERSECTED !== null) {
+
+        attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 0.5;
+        attributes.size.needsUpdate = true;
+        INTERSECTED = null;
+
+    }
 
     renderer.render(scene, camera);
 
@@ -455,6 +556,6 @@ function onValveClick(instanceId) {
     }
 }
 
-function onPipelineClick(instanceId){
+function onPipelineClick(instanceId) {
     gui.populateInfo(pipeline_mesh_inputs[instanceId].information);
 }

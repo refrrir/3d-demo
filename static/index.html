@@ -1,34 +1,78 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>3D demo</title>
 
-    <link href="sytle.css" type="text/css" rel="stylesheet" />
-    <link href="switch.css" type="text/css" rel="stylesheet" />
-    <link href="gui.css" type="text/css" rel="stylesheet" />
+<head>
+  <meta charset="utf-8" />
+  <title>3D demo</title>
 
-    <template id="text-li">
-      <li class="list-item">
-        <span class="property-name"></span>
-        <div class="property-value">
-          <input type="text" class="text-style" />
-        </div>
-      </li>
-    </template>
-    <template id="checkbox-li">
-      <li class="list-item">
-        <span class="property-name"></span>
-        <div class="property-value">
-          <input type="checkbox" class="checkbox-switch" />
-        </div>
-      </li>
-    </template>
-  </head>
+  <link href="sytle.css" type="text/css" rel="stylesheet" />
+  <link href="switch.css" type="text/css" rel="stylesheet" />
+  <link href="gui.css" type="text/css" rel="stylesheet" />
 
-  <body>
-    <div id="container"></div>
-    <div id="gui-container" draggable="true"></div>
-    <script src="main.js"></script>
-  </body>
+  <template id="text-li">
+    <li class="list-item">
+      <span class="property-name"></span>
+      <div class="property-value">
+        <input type="text" class="text-style" />
+      </div>
+    </li>
+  </template>
+  <template id="checkbox-li">
+    <li class="list-item">
+      <span class="property-name"></span>
+      <div class="property-value">
+        <input type="checkbox" class="checkbox-switch" />
+      </div>
+    </li>
+  </template>
+</head>
+
+<body>
+  <div id="container"></div>
+  <div id="gui-container" draggable="true"></div>
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+    attribute float size;
+    attribute vec3 customColor;
+
+    varying vec3 vColor;
+
+    void main() {
+
+      vColor = customColor;
+
+      vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+      gl_PointSize = size * ( 300.0 / -mvPosition.z );
+
+      gl_Position = projectionMatrix * mvPosition;
+
+    }
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+
+    uniform vec3 color;
+    uniform sampler2D pointTexture;
+    uniform float alphaTest;
+
+    varying vec3 vColor;
+
+    void main() {
+
+      gl_FragColor = vec4( color * vColor, 1.0 );
+
+      gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+
+      if ( gl_FragColor.a < alphaTest ) discard;
+
+    }
+
+  </script>
+
+  <script src="main.js"></script>
+
+</body>
+
 </html>

@@ -5,27 +5,34 @@ class GUIPanel {
 
     guiContainer: HTMLElement;
     gui: GUI;
+    obj: { [k: string]: string | boolean } = {};
 
     constructor(containerId: string) {
         this.guiContainer = document.getElementById(containerId) as HTMLElement;
         this.gui = new GUI({ container: this.guiContainer });
         this.boundDrag(this.guiContainer);
+        this.obj.showVertices = true; 
+        for (const key in this.obj) {
+            this.gui.add(this.obj, key);
+        }
     }
 
     populateInfo(info: Information[] = [] , isValveOn?: boolean) {
+        let showVertices = this.obj.showVertices;
+        this.obj = {};
         this.gui.destroy();
-        this.gui = new GUI({ container: this.guiContainer });
 
-        let obj: { [k: string]: string | boolean } = {};
+        this.gui = new GUI({ container: this.guiContainer });
+        this.obj.showVertices = showVertices;
 
         info.forEach((i => {
-            obj[i.name] = i.value;
+            this.obj[i.name] = i.value;
         }))
 
-        isValveOn != undefined && (obj.valveStatus = isValveOn);
+        isValveOn != undefined && (this.obj.valveStatus = isValveOn);
 
-        for (const key in obj) {
-            this.gui.add(obj, key);
+        for (const key in this.obj) {
+            this.gui.add(this.obj, key);
         }
     }
 
