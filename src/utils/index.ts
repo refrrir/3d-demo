@@ -1,5 +1,5 @@
 import { CIRCUIT_TYPE } from "@constants";
-import { CircuitMeshInputProps, PipelineMeshInputProps, ValveMeshInputProps, ValvePipelineRelationProps } from "@models";
+import { CircuitMeshInputProps, PipelineMeshInputProps, ValveMeshInputProps } from "@models";
 
 export abstract class Utils {
 
@@ -38,5 +38,5 @@ export abstract class Utils {
             }
         }
     }
-    
+
 }
