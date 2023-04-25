@@ -1,3 +1,4 @@
+import { CIRCUIT_TYPE } from '@constants';
 import { Vector3 } from 'three';
 
 interface Information {
@@ -17,6 +18,9 @@ interface CircuitMeshInputProps {
     clickable?: boolean;
     onClickEvent?: () => void;
     child?: CircuitMeshInputProps[];
+    type: CIRCUIT_TYPE;
+    isConnected: boolean; //气体是否能到达此处
+    index?: number;
 
 }
 

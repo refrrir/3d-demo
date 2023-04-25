@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh } from '@objects';
-import { COLOR, DIRECTION } from '@constants';
+import { CIRCUIT_TYPE, COLOR, DIRECTION } from '@constants';
 import { Utils } from '@utils';
 
 // panel example
@@ -62,358 +62,474 @@ const mouse = new THREE.Vector2(1, 1);
 
 // 输入
 
+
+const test_inputs = [
+  {
+    // 热水器阀
+    position_x: -55,
+    position_y: 12.6,
+    position_z: -103,
+    isValveOn: true,
+    radius: 0.5,
+    information: [
+      { name: "ID", value: "50-5-H" },
+      { name: "Name", value: "water heater valve" },
+      { name: "Location", value: "kitchen" },
+      { name: "Type", value: "solenoid valve" },
+      { name: "Model", value: "JKB-V1-DN50" },
+    ],
+    type: CIRCUIT_TYPE.VALVE,
+    child: [
+      {
+        // 热水器管
+        position_x: -55,
+        position_y: 14,
+        position_z: -103,
+        rotation_direction: DIRECTION.Z,
+        rotation_degree: 0,
+        radius: 0.3,
+        height: 3,
+        information: [
+          { name: "ID", value: "987-111-P" },
+          { name: "Type", value: "Gas" },
+          { name: "Model", value: "DN50" },
+          { name: "Presure", value: "3.6 Kpa" },
+          { name: "Location", value: "bathroom" },
+        ],
+        type: CIRCUIT_TYPE.PIPELINE,
+      },
+      {
+        // 热水器立管
+        position_x: -55,
+        position_y: 8.9,
+        position_z: -103,
+        rotation_direction: DIRECTION.Z,
+        rotation_degree: 0,
+        radius: 0.3,
+        height: 7,
+        information: [
+          { name: "ID", value: "987-69-P" },
+          { name: "Type", value: "Gas" },
+          { name: "Model", value: "DN50" },
+          { name: "Presure", value: "3.5 Kpa" },
+          { name: "Location", value: "bathroom" },
+        ],
+        type: CIRCUIT_TYPE.PIPELINE,
+        child: [
+          {
+            // 灶前水平管
+            position_x: 5.37,
+            position_y: 60,
+            position_z: -103,
+            rotation_direction: DIRECTION.Z,
+            rotation_degree: Math.PI * 0.5,
+            radius: 0.3,
+            height: 18,
+            information: [
+              { name: "ID", value: "987-765-P" },
+              { name: "Type", value: "Gas" },
+              { name: "Model", value: "DN80" },
+              { name: "Presure", value: "3.4 Kpa" },
+              { name: "Location", value: "kitchen" },
+            ],
+            type: CIRCUIT_TYPE.PIPELINE,
+          },
+          {
+            // 总阀
+            position_x: -51,
+            position_y: 5.37,
+            position_z: -103,
+            isValveOn: false,
+            radius: 0.5,
+            information: [
+              { name: "ID", value: "99001-765-M" },
+              { name: "Name", value: "main valve" },
+              { name: "Location", value: "outdoor" },
+              { name: "Type", value: "manual valve" },
+              { name: "Model", value: "JKB-V2-DN120" },
+            ],
+            type: CIRCUIT_TYPE.VALVE,
+            child: [
+              {
+                // 立管
+                position_x: -51,
+                position_y: 1.3,
+                position_z: -103,
+                rotation_direction: DIRECTION.Z,
+                rotation_degree: 0,
+                radius: 0.3,
+                height: 8.8,
+                information: [
+                  { name: "ID", value: "987-65-P" },
+                  { name: "Type", value: "Gas" },
+                  { name: "Model", value: "DN80" },
+                  { name: "Presure", value: "3.3 Kpa" },
+                  { name: "Location", value: "kitchen" },
+                ],
+                type: CIRCUIT_TYPE.PIPELINE,
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
+
 // 阀门
 const valve_mesh_inputs = [
-    {
-      // 总阀
-      position_x: -51,
-      position_y: 5.37,
-      position_z: -103,
-      isValveOn: false,
-      radius: 0.5,
-      information: [
-        { name: "ID", value: "99001-765-M" },
-        { name: "Name", value: "main valve" },
-        { name: "Location", value: "outdoor" },
-        { name: "Type", value: "manual valve" },
-        { name: "Model", value: "JKB-V2-DN120" },
-      ],
-    },
-    {
-      // 入户阀
-      position_x: -51,
-      position_y: -3,
-      position_z: -123,
-      isValveOn: true,
-      radius: 0.7,
-      information: [
-        { name: "ID", value: "60-5-H" },
-        { name: "Name", value: "house valve" },
-        { name: "Location", value: "kitchen" },
-        { name: "Type", value: "solenoid valve" },
-        { name: "Model", value: "JKB-V1-DN80" },
-      ],
-    },
-    {
-      // 热水器阀
-      position_x: -55,
-      position_y: 12.6,
-      position_z: -103,
-      isValveOn: true,
-      radius: 0.5,
-      information: [
-        { name: "ID", value: "50-5-H" },
-        { name: "Name", value: "water heater valve" },
-        { name: "Location", value: "kitchen" },
-        { name: "Type", value: "solenoid valve" },
-        { name: "Model", value: "JKB-V1-DN50" },
-      ],
-    },
-  ];
-  
-  //管道
-  const pipeline_mesh_inputs = [
-    {
-      // 总管
-      position_x: -51,
-      position_y: -5,
-      position_z: -123,
-      rotation_direction: DIRECTION.Z,
-      rotation_degree: 0,
-      radius: 0.35,
-      height: 3,
-      information: [
-        { name: "ID", value: "001-E" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN120" },
-        { name: "Presure", value: "3.1 Kpa" },
-        { name: "Location", value: "outdoor" },
-      ],
-    },
-    {
-      // 入户水平管
-      position_x: -51,
-      position_y: -113,
-      position_z: 3,
-      rotation_direction: DIRECTION.X,
-      rotation_degree: Math.PI * 0.5,
-      radius: 0.3,
-      height: 20.2,
-      information: [
-        { name: "ID", value: "91-P" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN50" },
-        { name: "Presure", value: "3.2 Kpa" },
-        { name: "Location", value: "kitchen" },
-      ],
-    },
-    {
-      // 立管
-      position_x: -51,
-      position_y: 1.3,
-      position_z: -103,
-      rotation_direction: DIRECTION.Z,
-      rotation_degree: 0,
-      radius: 0.3,
-      height: 8.8,
-      information: [
-        { name: "ID", value: "987-65-P" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN80" },
-        { name: "Presure", value: "3.3 Kpa" },
-        { name: "Location", value: "kitchen" },
-      ],
-    },
-    {
-      // 灶前水平管
-      position_x: 5.37,
-      position_y: 60,
-      position_z: -103,
-      rotation_direction: DIRECTION.Z,
-      rotation_degree: Math.PI * 0.5,
-      radius: 0.3,
-      height: 18,
-      information: [
-        { name: "ID", value: "987-765-P" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN80" },
-        { name: "Presure", value: "3.4 Kpa" },
-        { name: "Location", value: "kitchen" },
-      ],
-    },
-    {
-      // 热水器立管
-      position_x: -55,
-      position_y: 8.9,
-      position_z: -103,
-      rotation_direction: DIRECTION.Z,
-      rotation_degree: 0,
-      radius: 0.3,
-      height: 7,
-      information: [
-        { name: "ID", value: "987-69-P" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN50" },
-        { name: "Presure", value: "3.5 Kpa" },
-        { name: "Location", value: "bathroom" },
-      ],
-    },
-    {
-      // 热水器管
-      position_x: -55,
-      position_y: 14,
-      position_z: -103,
-      rotation_direction: DIRECTION.Z,
-      rotation_degree: 0,
-      radius: 0.3,
-      height: 3,
-      information: [
-        { name: "ID", value: "987-111-P" },
-        { name: "Type", value: "Gas"},
-        { name: "Model", value: "DN50" },
-        { name: "Presure", value: "3.6 Kpa" },
-        { name: "Location", value: "bathroom" },
-      ],
-    },
-  ];
-
-//开关和管道的对应
-const valves_pipelines_relations = [
-    // { valve_index: 0, pipeline_index: 0 },
-    { valve_index: 0, pipeline_index: 2 },
+  {
+    // 总阀
+    position_x: -51,
+    position_y: 5.37,
+    position_z: -103,
+    isValveOn: false,
+    radius: 0.5,
+    information: [
+      { name: "ID", value: "99001-765-M" },
+      { name: "Name", value: "main valve" },
+      { name: "Location", value: "outdoor" },
+      { name: "Type", value: "manual valve" },
+      { name: "Model", value: "JKB-V2-DN120" },
+    ],
+  },
+  {
+    // 入户阀
+    position_x: -51,
+    position_y: -3,
+    position_z: -123,
+    isValveOn: true,
+    radius: 0.7,
+    information: [
+      { name: "ID", value: "60-5-H" },
+      { name: "Name", value: "house valve" },
+      { name: "Location", value: "kitchen" },
+      { name: "Type", value: "solenoid valve" },
+      { name: "Model", value: "JKB-V1-DN80" },
+    ],
+  },
+  {
+    // 热水器阀
+    position_x: -55,
+    position_y: 12.6,
+    position_z: -103,
+    isValveOn: true,
+    radius: 0.5,
+    information: [
+      { name: "ID", value: "50-5-H" },
+      { name: "Name", value: "water heater valve" },
+      { name: "Location", value: "kitchen" },
+      { name: "Type", value: "solenoid valve" },
+      { name: "Model", value: "JKB-V1-DN50" },
+    ],
+  },
 ];
+
+//管道
+const pipeline_mesh_inputs = [
+  {
+    // 总管
+    position_x: -51,
+    position_y: -5,
+    position_z: -123,
+    rotation_direction: DIRECTION.Z,
+    rotation_degree: 0,
+    radius: 0.35,
+    height: 3,
+    information: [
+      { name: "ID", value: "001-E" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN120" },
+      { name: "Presure", value: "3.1 Kpa" },
+      { name: "Location", value: "outdoor" },
+    ],
+  },
+  {
+    // 入户水平管
+    position_x: -51,
+    position_y: -113,
+    position_z: 3,
+    rotation_direction: DIRECTION.X,
+    rotation_degree: Math.PI * 0.5,
+    radius: 0.3,
+    height: 20.2,
+    information: [
+      { name: "ID", value: "91-P" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN50" },
+      { name: "Presure", value: "3.2 Kpa" },
+      { name: "Location", value: "kitchen" },
+    ],
+  },
+  {
+    // 立管
+    position_x: -51,
+    position_y: 1.3,
+    position_z: -103,
+    rotation_direction: DIRECTION.Z,
+    rotation_degree: 0,
+    radius: 0.3,
+    height: 8.8,
+    information: [
+      { name: "ID", value: "987-65-P" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN80" },
+      { name: "Presure", value: "3.3 Kpa" },
+      { name: "Location", value: "kitchen" },
+    ],
+  },
+  {
+    // 灶前水平管
+    position_x: 5.37,
+    position_y: 60,
+    position_z: -103,
+    rotation_direction: DIRECTION.Z,
+    rotation_degree: Math.PI * 0.5,
+    radius: 0.3,
+    height: 18,
+    information: [
+      { name: "ID", value: "987-765-P" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN80" },
+      { name: "Presure", value: "3.4 Kpa" },
+      { name: "Location", value: "kitchen" },
+    ],
+  },
+  {
+    // 热水器立管
+    position_x: -55,
+    position_y: 8.9,
+    position_z: -103,
+    rotation_direction: DIRECTION.Z,
+    rotation_degree: 0,
+    radius: 0.3,
+    height: 7,
+    information: [
+      { name: "ID", value: "987-69-P" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN50" },
+      { name: "Presure", value: "3.5 Kpa" },
+      { name: "Location", value: "bathroom" },
+    ],
+  },
+  {
+    // 热水器管
+    position_x: -55,
+    position_y: 14,
+    position_z: -103,
+    rotation_direction: DIRECTION.Z,
+    rotation_degree: 0,
+    radius: 0.3,
+    height: 3,
+    information: [
+      { name: "ID", value: "987-111-P" },
+      { name: "Type", value: "Gas" },
+      { name: "Model", value: "DN50" },
+      { name: "Presure", value: "3.6 Kpa" },
+      { name: "Location", value: "bathroom" },
+    ],
+  },
+];
+
+
 
 init();
 animate();
 
 function init() {
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(30, 6, 30);
-    camera.lookAt(0, 0, 0);
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(30, 6, 30);
+  camera.lookAt(0, 0, 0);
 
-    scene = new THREE.Scene();
+  scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0xa0a0a0);
+  scene.background = new THREE.Color(0xa0a0a0);
 
-    // LIGHT
+  // LIGHT
 
-    const spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.angle = Math.PI / 5;
-    spotLight.penumbra = 0.2;
-    spotLight.position.set(30, 20, 30);
-    spotLight.castShadow = true;
-    // spotLight.shadow.camera.near = 3;
-    // spotLight.shadow.camera.far = 10;
-    spotLight.shadow.mapSize.width = 1024;
-    spotLight.shadow.mapSize.height = 1024;
-    scene.add(spotLight);
+  const spotLight = new THREE.SpotLight(0xffffff);
+  spotLight.angle = Math.PI / 5;
+  spotLight.penumbra = 0.2;
+  spotLight.position.set(30, 20, 30);
+  spotLight.castShadow = true;
+  // spotLight.shadow.camera.near = 3;
+  // spotLight.shadow.camera.far = 10;
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+  scene.add(spotLight);
 
-    const dirLight = new THREE.DirectionalLight(0x55505a, 1);
-    dirLight.position.set(-10, 30, 30);
-    dirLight.castShadow = true;
+  const dirLight = new THREE.DirectionalLight(0x55505a, 1);
+  dirLight.position.set(-10, 30, 30);
+  dirLight.castShadow = true;
 
-    dirLight.shadow.mapSize.width = 1024;
-    dirLight.shadow.mapSize.height = 1024;
-    scene.add(dirLight);
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  scene.add(dirLight);
 
-    // GROUND
+  // GROUND
 
-    const geometry = new THREE.PlaneGeometry(100, 100);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: COLOR.WHITE });
+  const geometry = new THREE.PlaneGeometry(100, 100);
+  const planeMaterial = new THREE.MeshPhongMaterial({ color: COLOR.WHITE });
 
-    const ground = new THREE.Mesh(geometry, planeMaterial);
+  const ground = new THREE.Mesh(geometry, planeMaterial);
 
-    ground.position.set(0, -1, 0);
-    ground.rotation.x = - Math.PI / 2;
-    ground.scale.set(100, 100, 100);
+  ground.position.set(0, -1, 0);
+  ground.rotation.x = - Math.PI / 2;
+  ground.scale.set(100, 100, 100);
 
-    ground.castShadow = false;
-    ground.receiveShadow = true;
+  ground.castShadow = false;
+  ground.receiveShadow = true;
 
-    scene.add(ground);
+  scene.add(ground);
 
-    // GRID
+  // GRID
 
-    const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
-    grid.material.opacity = 0.2;
-    grid.material.transparent = true;
-    scene.add(grid);
-
-
-    all_mesh = new THREE.Group();
-    circuit_mesh = new THREE.Group();
-
-    updatePipelineConnectStatus();
-
-    // 开关初始化
-    valves_mesh = new ValveMesh(valve_mesh_inputs, onValveClick);
-
-    circuit_mesh.add(valves_mesh.render());
+  const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
+  grid.material.opacity = 0.2;
+  grid.material.transparent = true;
+  scene.add(grid);
 
 
-    // 管道初始化
-    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, onPipelineClick);
+  all_mesh = new THREE.Group();
+  circuit_mesh = new THREE.Group();
 
-    circuit_mesh.add(pipelines_mesh.render());
+  Utils.connectFromHere(test_inputs);
 
-    all_mesh.add(circuit_mesh);
+  // 开关初始化
+  valves_mesh = new ValveMesh(test_inputs, onValveClick);
 
-    scene.add(all_mesh);
+  circuit_mesh.add(valves_mesh.render());
 
-    loader.load(
-        // resource URL
-        '../models/3d_house.gltf',
-        // called when the resource is loaded
-        function (gltf) {
-            gltf.scene.traverse(function (node) {
-                if (node.isMesh) {
-                    node.castShadow = true;
-                    node.userData.clickable = false;
-                    // node.receiveShadow = true;
-                }
-            })
-            scene.add(gltf.scene);
-            all_mesh.add(gltf.scene);
-            gltf.animations; // Array<THREE.AnimationClip>
-            gltf.scene.scale.set(2, 2, 2); // THREE.Group
-            gltf.scene.rotation.x -= Math.PI * 0.5;
-            gltf.scenes; // Array<THREE.Group>
-            gltf.asset; // Object
-            gltf.scene.position.setX(-20);
-            gltf.scene.position.setZ(15);
-            gltf.scene.position.setY(-1);
-        },
-        // called while loading is progressing
-        function (xhr) {
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-        },
-        // called when loading has errors
-        function (error) {
-            console.log('An error happened: ' + error);
+
+  // 管道初始化
+  pipelines_mesh = new PipelineMesh(test_inputs, onPipelineClick);
+
+  circuit_mesh.add(pipelines_mesh.render());
+
+  all_mesh.add(circuit_mesh);
+
+  scene.add(all_mesh);
+
+  loader.load(
+    // resource URL
+    '../models/3d_house.gltf',
+    // called when the resource is loaded
+    function (gltf) {
+      gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.userData.clickable = false;
+          // node.receiveShadow = true;
         }
-    );
+      })
+      scene.add(gltf.scene);
+      all_mesh.add(gltf.scene);
+      gltf.animations; // Array<THREE.AnimationClip>
+      gltf.scene.scale.set(2, 2, 2); // THREE.Group
+      gltf.scene.rotation.x -= Math.PI * 0.5;
+      gltf.scenes; // Array<THREE.Group>
+      gltf.asset; // Object
+      gltf.scene.position.setX(-20);
+      gltf.scene.position.setZ(15);
+      gltf.scene.position.setY(-1);
+    },
+    // called while loading is progressing
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    // called when loading has errors
+    function (error) {
+      console.log('An error happened: ' + error);
+    }
+  );
 
-    circuit_mesh.scale.set(0.2, 0.2, 0.2);
+  circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
 
-    renderer.shadowMapSoft = true;
+  renderer.shadowMapSoft = true;
 
-    renderer.shadowCameraNear = 3;
-    renderer.shadowCameraFar = camera.far;
-    renderer.shadowCameraFov = 50;
+  renderer.shadowCameraNear = 3;
+  renderer.shadowCameraFar = camera.far;
+  renderer.shadowCameraFov = 50;
 
-    renderer.shadowMapBias = 0.0039;
-    renderer.shadowMapDarkness = 0.5;
-    renderer.shadowMapWidth = 1024;
-    renderer.shadowMapHeight = 1024;
+  renderer.shadowMapBias = 0.0039;
+  renderer.shadowMapDarkness = 0.5;
+  renderer.shadowMapWidth = 1024;
+  renderer.shadowMapHeight = 1024;
 
-    document.body.appendChild(renderer.domElement);
+  document.body.appendChild(renderer.domElement);
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.maxPolarAngle = Math.PI * 0.5;
-    controls.enableDamping = true;
-    controls.enableZoom = true;
-    controls.screenSpacePanning = false;
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.maxPolarAngle = Math.PI * 0.5;
+  controls.enableDamping = true;
+  controls.enableZoom = true;
+  controls.screenSpacePanning = false;
 
-    stats = new Stats();
-    document.body.appendChild(stats.dom);
+  stats = new Stats();
+  document.body.appendChild(stats.dom);
 
-    gui = new GUIPanel('gui-container');
+  gui = new GUIPanel('gui-container');
 
 
-    window.addEventListener('resize', onWindowResize);
-    document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onGlobalClick);
+  window.addEventListener('resize', onWindowResize);
+  document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onGlobalClick);
 
 }
 
 function onWindowResize() {
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
 
 function onGlobalClick(event) {
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, camera);
+  raycaster.setFromCamera(mouse, camera);
 
-    const intersection = raycaster.intersectObject(all_mesh);
+  const intersection = raycaster.intersectObject(all_mesh);
 
-    if (intersection.length > 0) {
+  if (intersection.length > 0) {
 
-        if (intersection[0].object.userData.isVavleMesh) {
+    if (intersection[0].object.userData.isVavleMesh) {
 
-            const instanceId = intersection[0].instanceId;
+      const instanceId = intersection[0].instanceId;
 
-            if (valve_mesh_inputs[instanceId].clickable) {
+      const clickInstance = Utils.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.VALVE);
 
-                valve_mesh_inputs[instanceId].onClickEvent();
-            }
+      if (!!clickInstance && clickInstance.clickable) {
 
-        }
-        
-        if (intersection[0].object.userData.isPipelineMesh) {
+        clickInstance.onClickEvent();
 
-            const instanceId = intersection[0].instanceId;
-
-            if (pipeline_mesh_inputs[instanceId].clickable) {
-
-                pipeline_mesh_inputs[instanceId].onClickEvent();
-            }
-
-        }
+      }
 
     }
+
+    if (intersection[0].object.userData.isPipelineMesh) {
+
+      const instanceId = intersection[0].instanceId;
+
+      const clickInstance = Utils.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.PIPELINE);
+
+      if (!!clickInstance && clickInstance.clickable) {
+
+        clickInstance.onClickEvent();
+
+      }
+
+    }
+
+  }
 
 }
 
@@ -421,58 +537,54 @@ function onGlobalClick(event) {
 
 function animate() {
 
-    requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 
-    controls.update();
+  controls.update();
 
-    raycaster.setFromCamera(mouse, camera);
+  raycaster.setFromCamera(mouse, camera);
 
-    render();
+  render();
 
-    stats.update();
+  stats.update();
 
 }
 
 function render() {
 
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 
 }
 
-function onValveClick(instanceId) {
+function onValveClick(valveProps) {
 
-    gui.populateInfo(valve_mesh_inputs[instanceId].information, valve_mesh_inputs[instanceId].isValveOn)
+  gui.populateInfo(valveProps.information, valveProps.isValveOn)
 
-    const pipelineId = Utils.findRelatedPipelines(valves_pipelines_relations, instanceId);
+  gui.onValveStatusUpdate(() => {
+    valveProps.isValveOn = !valveProps.isValveOn;
+    updatePipelineConnectStatus(valveProps);
+    valves_mesh.rerender();
+    pipelines_mesh.rerender();
+  });
 
-    if (pipelineId != -1) {
+}
 
-        gui.onValveStatusUpdate(() => {
-            valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
-            updatePipelineConnectStatus();
-            valves_mesh.rerender();
-            pipelines_mesh.rerender();
-        })
+function onPipelineClick(pipelineProps) {
+  gui.populateInfo(pipelineProps.information);
+}
 
+function updatePipelineConnectStatus(valveProps) {
+
+  const isConnected = !!valveProps.isConnected;
+  const childs = valveProps.child;
+
+  if (childs) {
+    if (isConnected) {
+      console.log("connected!");
+      Utils.connectFromHere([valveProps]);
+    } else {
+      console.log("disconnected!")
+      Utils.disconnectFromHere(valveProps.child);
     }
-}
+  }
 
-function onPipelineClick(instanceId){
-    gui.populateInfo(pipeline_mesh_inputs[instanceId].information);
-}
-
-function updatePipelineConnectStatus(){
-    for (const relation of valves_pipelines_relations) {
-
-        const valve_index = relation.valve_index;
-        const pipeline_index = relation.pipeline_index;
-
-        if (valve_index >= 0 && valve_index < valve_mesh_inputs.length && pipeline_index >= 0 && pipeline_index < pipeline_mesh_inputs.length) {
-            if (valve_mesh_inputs[valve_index].isValveOn) {
-                pipeline_mesh_inputs[pipeline_index].isPipelineConnected = true;
-            } else {
-                pipeline_mesh_inputs[pipeline_index].isPipelineConnected = false;
-            }
-        }
-    }
 }
