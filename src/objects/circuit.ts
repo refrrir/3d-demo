@@ -44,6 +44,20 @@ abstract class CircuitMesh {
 
 
     protected abstract renderSingleIntance(circuitProps: CircuitMeshInputProps) : void;
+
+    static findByIndex(index: number, circuit_mesh_input_props: CircuitMeshInputProps[], type: CIRCUIT_TYPE): CircuitMeshInputProps | null {
+        for (let i = 0; i < circuit_mesh_input_props.length; i++) {
+            if (circuit_mesh_input_props[i].type === type && circuit_mesh_input_props[i].index === index) {
+                return circuit_mesh_input_props[i];
+            } else {
+                const childs = circuit_mesh_input_props[i].child;
+                if (childs && !!this.findByIndex(index, childs, type)) {
+                    return this.findByIndex(index, childs, type);
+                }
+            }
+        }
+        return null;
+    }
 }
 
 export { CircuitMesh };

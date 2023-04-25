@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GUIPanel } from "@components";
-import { ValveMesh, PipelineMesh } from '@objects';
+import { ValveMesh, PipelineMesh, CircuitMesh } from '@objects';
 import { CIRCUIT_TYPE, COLOR, DIRECTION } from '@constants';
 import { Utils } from '@utils';
 
@@ -505,7 +505,7 @@ function onGlobalClick(event) {
 
       const instanceId = intersection[0].instanceId;
 
-      const clickInstance = Utils.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.VALVE);
+      const clickInstance = CircuitMesh.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.VALVE);
 
       if (!!clickInstance && clickInstance.clickable) {
 
@@ -519,7 +519,7 @@ function onGlobalClick(event) {
 
       const instanceId = intersection[0].instanceId;
 
-      const clickInstance = Utils.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.PIPELINE);
+      const clickInstance = CircuitMesh.findByIndex(instanceId, test_inputs, CIRCUIT_TYPE.PIPELINE);
 
       if (!!clickInstance && clickInstance.clickable) {
 
