@@ -69,7 +69,7 @@ const test_inputs = [
     position_x: -55,
     position_y: 12.6,
     position_z: -103,
-    isValveOn: true,
+    isValveOn: false,
     radius: 0.5,
     information: [
       { name: "ID", value: "50-5-H" },
@@ -167,6 +167,62 @@ const test_inputs = [
                   { name: "Location", value: "kitchen" },
                 ],
                 type: CIRCUIT_TYPE.PIPELINE,
+                child: [{
+                  // 入户水平管
+                  position_x: -51,
+                  position_y: -113,
+                  position_z: 3,
+                  rotation_direction: DIRECTION.X,
+                  rotation_degree: Math.PI * 0.5,
+                  radius: 0.3,
+                  height: 20.2,
+                  information: [
+                    { name: "ID", value: "91-P" },
+                    { name: "Type", value: "Gas" },
+                    { name: "Model", value: "DN50" },
+                    { name: "Presure", value: "3.2 Kpa" },
+                    { name: "Location", value: "kitchen" },
+                  ],
+                  type: CIRCUIT_TYPE.PIPELINE,
+                  child: [
+                    {
+                      // 入户阀
+                      position_x: -51,
+                      position_y: -3,
+                      position_z: -123,
+                      isValveOn: true,
+                      radius: 0.7,
+                      information: [
+                        { name: "ID", value: "60-5-H" },
+                        { name: "Name", value: "house valve" },
+                        { name: "Location", value: "kitchen" },
+                        { name: "Type", value: "solenoid valve" },
+                        { name: "Model", value: "JKB-V1-DN80" },
+                      ],
+                      type: CIRCUIT_TYPE.VALVE,
+                      child: [
+                        {
+                          // 总管
+                          position_x: -51,
+                          position_y: -5,
+                          position_z: -123,
+                          rotation_direction: DIRECTION.Z,
+                          rotation_degree: 0,
+                          radius: 0.35,
+                          height: 3,
+                          information: [
+                            { name: "ID", value: "001-E" },
+                            { name: "Type", value: "Gas" },
+                            { name: "Model", value: "DN120" },
+                            { name: "Presure", value: "3.1 Kpa" },
+                            { name: "Location", value: "outdoor" },
+                          ],
+                          type: CIRCUIT_TYPE.PIPELINE,
+                        }
+                      ]
+                    }
+                  ]
+                }]
               }
             ]
           }
@@ -423,8 +479,10 @@ function init() {
           // node.receiveShadow = true;
         }
       })
+      //注释下面两行不显示房间 
       scene.add(gltf.scene);
       all_mesh.add(gltf.scene);
+
       gltf.animations; // Array<THREE.AnimationClip>
       gltf.scene.scale.set(2, 2, 2); // THREE.Group
       gltf.scene.rotation.x -= Math.PI * 0.5;
