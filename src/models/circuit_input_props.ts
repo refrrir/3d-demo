@@ -16,6 +16,7 @@ interface CircuitMeshInputProps {
     informations?: Information[];
     clickable?: boolean;
     onClickEvent?: () => void;
+    child?: CircuitMeshInputProps[];
 
 }
 

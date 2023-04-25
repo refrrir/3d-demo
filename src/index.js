@@ -219,8 +219,8 @@ const valve_mesh_inputs = [
 
 //开关和管道的对应
 const valves_pipelines_relations = [
-    { valve_index: 0, pipeline_index: 0 },
-    { valve_index: 1, pipeline_index: 2 },
+    // { valve_index: 0, pipeline_index: 0 },
+    { valve_index: 0, pipeline_index: 2 },
 ];
 
 init();
@@ -284,6 +284,7 @@ function init() {
     all_mesh = new THREE.Group();
     circuit_mesh = new THREE.Group();
 
+    updatePipelineConnectStatus();
 
     // 开关初始化
     valves_mesh = new ValveMesh(valve_mesh_inputs, onValveClick);
@@ -292,7 +293,7 @@ function init() {
 
 
     // 管道初始化
-    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, valve_mesh_inputs, valves_pipelines_relations, onPipelineClick);
+    pipelines_mesh = new PipelineMesh(pipeline_mesh_inputs, onPipelineClick);
 
     circuit_mesh.add(pipelines_mesh.render());
 
@@ -448,6 +449,7 @@ function onValveClick(instanceId) {
 
         gui.onValveStatusUpdate(() => {
             valve_mesh_inputs[instanceId].isValveOn = !valve_mesh_inputs[instanceId].isValveOn;
+            updatePipelineConnectStatus();
             valves_mesh.rerender();
             pipelines_mesh.rerender();
         })
@@ -457,4 +459,20 @@ function onValveClick(instanceId) {
 
 function onPipelineClick(instanceId){
     gui.populateInfo(pipeline_mesh_inputs[instanceId].information);
+}
+
+function updatePipelineConnectStatus(){
+    for (const relation of valves_pipelines_relations) {
+
+        const valve_index = relation.valve_index;
+        const pipeline_index = relation.pipeline_index;
+
+        if (valve_index >= 0 && valve_index < valve_mesh_inputs.length && pipeline_index >= 0 && pipeline_index < pipeline_mesh_inputs.length) {
+            if (valve_mesh_inputs[valve_index].isValveOn) {
+                pipeline_mesh_inputs[pipeline_index].isPipelineConnected = true;
+            } else {
+                pipeline_mesh_inputs[pipeline_index].isPipelineConnected = false;
+            }
+        }
+    }
 }
