@@ -501,7 +501,7 @@ function onGlobalClick(event) {
 
   if (intersection.length > 0) {
 
-    if (intersection[0].object.userData.isVavleMesh) {
+    if (intersection[0].object.userData.isValveMesh) {
 
       const instanceId = intersection[0].instanceId;
 
