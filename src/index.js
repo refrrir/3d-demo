@@ -8,46 +8,6 @@ import { ValveMesh, PipelineMesh, CircuitMesh } from '@objects';
 import { CIRCUIT_TYPE, COLOR, DIRECTION } from '@constants';
 import { Utils } from '@utils';
 
-// panel example
-// import { insertTextList, insertCheckboxList, removeListItems, } from "./component/panel.ts";
-
-// function removeList(checked) {
-//     if (!checked) removeListItems();
-// } // For test
-// function changeValveColor(checked) {
-//     if (checked) console.log("Valve => yellow");
-//     else console.log("Valve => gray");
-// } // Callback function
-// const valve_properties = [
-//     { name: "ID", value: "99001-765-M" },
-//     { name: "Name", value: "main valve" },
-//     { name: "Location", value: "kitchen" },
-//     { name: "Type", value: "solenoid valve" },
-//     { name: "Model", value: "JKB-V2-DN150" },
-// ]; // From entity.properties
-
-// let valveStatus = true // From entity.isSwitchOn
-// let pressure = 390.5 // From sensor
-// let properties = [
-//     ...valve_properties,
-//     ...[
-//         { name: "Valve status", value: valveStatus },
-//         { name: "Presure", value: `${pressure} Pascal` },
-//         { name: "testRemoveList", value: false },
-//     ],
-// ];
-// for (const property of properties) {
-//     if (typeof property.value == "string")
-//         insertTextList(property.name, property.value);
-//     else if (typeof property.value === "boolean")
-//         insertCheckboxList(
-//             property.name,
-//             property.value,
-//             property.name === "testRemoveList" ? removeList : changeValveColor
-//         );
-// }
-// End
-
 let camera, scene, renderer, controls, stats, gui;
 
 let valves_mesh; //开关
@@ -231,162 +191,6 @@ const test_inputs = [
     ]
   }
 ]
-
-// 阀门
-const valve_mesh_inputs = [
-  {
-    // 总阀
-    position_x: -51,
-    position_y: 5.37,
-    position_z: -103,
-    isValveOn: false,
-    radius: 0.5,
-    information: [
-      { name: "ID", value: "99001-765-M" },
-      { name: "Name", value: "main valve" },
-      { name: "Location", value: "outdoor" },
-      { name: "Type", value: "manual valve" },
-      { name: "Model", value: "JKB-V2-DN120" },
-    ],
-  },
-  {
-    // 入户阀
-    position_x: -51,
-    position_y: -3,
-    position_z: -123,
-    isValveOn: true,
-    radius: 0.7,
-    information: [
-      { name: "ID", value: "60-5-H" },
-      { name: "Name", value: "house valve" },
-      { name: "Location", value: "kitchen" },
-      { name: "Type", value: "solenoid valve" },
-      { name: "Model", value: "JKB-V1-DN80" },
-    ],
-  },
-  {
-    // 热水器阀
-    position_x: -55,
-    position_y: 12.6,
-    position_z: -103,
-    isValveOn: true,
-    radius: 0.5,
-    information: [
-      { name: "ID", value: "50-5-H" },
-      { name: "Name", value: "water heater valve" },
-      { name: "Location", value: "kitchen" },
-      { name: "Type", value: "solenoid valve" },
-      { name: "Model", value: "JKB-V1-DN50" },
-    ],
-  },
-];
-
-//管道
-const pipeline_mesh_inputs = [
-  {
-    // 总管
-    position_x: -51,
-    position_y: -5,
-    position_z: -123,
-    rotation_direction: DIRECTION.Z,
-    rotation_degree: 0,
-    radius: 0.35,
-    height: 3,
-    information: [
-      { name: "ID", value: "001-E" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN120" },
-      { name: "Presure", value: "3.1 Kpa" },
-      { name: "Location", value: "outdoor" },
-    ],
-  },
-  {
-    // 入户水平管
-    position_x: -51,
-    position_y: -113,
-    position_z: 3,
-    rotation_direction: DIRECTION.X,
-    rotation_degree: Math.PI * 0.5,
-    radius: 0.3,
-    height: 20.2,
-    information: [
-      { name: "ID", value: "91-P" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN50" },
-      { name: "Presure", value: "3.2 Kpa" },
-      { name: "Location", value: "kitchen" },
-    ],
-  },
-  {
-    // 立管
-    position_x: -51,
-    position_y: 1.3,
-    position_z: -103,
-    rotation_direction: DIRECTION.Z,
-    rotation_degree: 0,
-    radius: 0.3,
-    height: 8.8,
-    information: [
-      { name: "ID", value: "987-65-P" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN80" },
-      { name: "Presure", value: "3.3 Kpa" },
-      { name: "Location", value: "kitchen" },
-    ],
-  },
-  {
-    // 灶前水平管
-    position_x: 5.37,
-    position_y: 60,
-    position_z: -103,
-    rotation_direction: DIRECTION.Z,
-    rotation_degree: Math.PI * 0.5,
-    radius: 0.3,
-    height: 18,
-    information: [
-      { name: "ID", value: "987-765-P" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN80" },
-      { name: "Presure", value: "3.4 Kpa" },
-      { name: "Location", value: "kitchen" },
-    ],
-  },
-  {
-    // 热水器立管
-    position_x: -55,
-    position_y: 8.9,
-    position_z: -103,
-    rotation_direction: DIRECTION.Z,
-    rotation_degree: 0,
-    radius: 0.3,
-    height: 7,
-    information: [
-      { name: "ID", value: "987-69-P" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN50" },
-      { name: "Presure", value: "3.5 Kpa" },
-      { name: "Location", value: "bathroom" },
-    ],
-  },
-  {
-    // 热水器管
-    position_x: -55,
-    position_y: 14,
-    position_z: -103,
-    rotation_direction: DIRECTION.Z,
-    rotation_degree: 0,
-    radius: 0.3,
-    height: 3,
-    information: [
-      { name: "ID", value: "987-111-P" },
-      { name: "Type", value: "Gas" },
-      { name: "Model", value: "DN50" },
-      { name: "Presure", value: "3.6 Kpa" },
-      { name: "Location", value: "bathroom" },
-    ],
-  },
-];
-
 
 
 init();
@@ -637,10 +441,8 @@ function updatePipelineConnectStatus(valveProps) {
 
   if (childs) {
     if (isConnected) {
-      console.log("connected!");
       Utils.connectFromHere([valveProps]);
     } else {
-      console.log("disconnected!")
       Utils.disconnectFromHere(valveProps.child);
     }
   }
