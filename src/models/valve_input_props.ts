@@ -3,7 +3,7 @@ import { CircuitMeshInputProps } from "@models";
 
 interface ValveMeshInputProps extends CircuitMeshInputProps{
     
-    isValveOn: number;
+    isValveOn: boolean;
     radius: number;
     center_position: typeof Vector3;
 
