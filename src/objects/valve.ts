@@ -1,4 +1,4 @@
-import { InstancedMesh, Matrix4, IcosahedronGeometry, MeshPhongMaterial } from 'three';
+import { InstancedMesh, Matrix4, IcosahedronGeometry, MeshPhongMaterial, Vector3 } from 'three';
 import { CircuitMeshInputProps, ValveMeshInputProps } from '@models';
 import { CIRCUIT_TYPE, COLOR } from '@constants';
 import { CircuitMesh } from './circuit';
@@ -34,12 +34,12 @@ class ValveMesh extends CircuitMesh{
     protected renderSingleIntance(circuitProps: CircuitMeshInputProps) {
         if (circuitProps.type === CIRCUIT_TYPE.VALVE) {
             const valveProps = circuitProps as ValveMeshInputProps;
+            const center: typeof Vector3 = valveProps.center_position;
 
             const index = this.numberOfInstance;
             const valves_mesh = this.mesh;
             const sphere_matrix = new Matrix4();
-            // sphere_matrix.setPosition(valveProps.position_x, valveProps.position_y, valveProps.position_z);
-            sphere_matrix.multiply(new Matrix4().makeTranslation(valveProps.position_x, valveProps.position_y, valveProps.position_z));
+            sphere_matrix.multiply(new Matrix4().makeTranslation(center.x, center.y, center.z));
             sphere_matrix.multiply(new Matrix4().makeScale(valveProps.radius, valveProps.radius, valveProps.radius));
 
             valves_mesh.setMatrixAt(index, sphere_matrix);
