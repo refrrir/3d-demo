@@ -26,32 +26,54 @@ animate();
 
 function init() {
 
-  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-
   scene = new THREE.Scene();
-
   scene.background = new THREE.Color(0xa0a0a0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(-6, 1.2, -15);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target = new THREE.Vector3(-6.5, 1, -16);
+  controls.update();
+
 
   // LIGHT
 
-  const spotLight = new THREE.SpotLight(0xffffff);
-  spotLight.angle = Math.PI / 5;
-  spotLight.penumbra = 0.2;
-  spotLight.position.set(30, 20, 30);
-  spotLight.castShadow = true;
-  // spotLight.shadow.camera.near = 3;
-  // spotLight.shadow.camera.far = 10;
-  spotLight.shadow.mapSize.width = 1024;
-  spotLight.shadow.mapSize.height = 1024;
-  scene.add(spotLight);
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
+  dirLight1.position.set(0, 20, 0);
+  dirLight1.castShadow = false;
+  scene.add(dirLight1);
 
-  const dirLight = new THREE.DirectionalLight(0x55505a, 1);
-  dirLight.position.set(-10, 30, 30);
-  dirLight.castShadow = true;
+  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+  dirLight2.position.set(20, 0, 0);
+  dirLight2.castShadow = false;
+  scene.add(dirLight2);
 
-  dirLight.shadow.mapSize.width = 1024;
-  dirLight.shadow.mapSize.height = 1024;
-  scene.add(dirLight);
+  const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight3.position.set(0, 0, 20);
+  dirLight3.castShadow = false;
+  scene.add(dirLight3);
+
+  const dirLight4 = new THREE.DirectionalLight(0xffffff, 0.3);
+  dirLight4.position.set(0, -20, 0);
+  dirLight4.castShadow = false;
+  scene.add(dirLight4);
+
+  const dirLight5 = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight5.position.set(-20, 0, 0);
+  dirLight5.castShadow = false;
+  scene.add(dirLight5);
+
+  const dirLight6 = new THREE.DirectionalLight(0xffffff, 0.4);
+  dirLight6.position.set(0, 0, -20);
+  dirLight6.castShadow = false;
+  scene.add(dirLight6);
 
   // GROUND
 
@@ -65,7 +87,7 @@ function init() {
   ground.scale.set(100, 100, 100);
 
   ground.castShadow = false;
-  ground.receiveShadow = true;
+  ground.receiveShadow = false;
 
   scene.add(ground);
 
@@ -98,7 +120,6 @@ function init() {
   scene.add(all_mesh);
 
   loader.load(
-    // resource URL
     '../models/3d_house.gltf',
     // called when the resource is loaded
     function (gltf) {
@@ -106,18 +127,15 @@ function init() {
         if (node.isMesh) {
           node.castShadow = true;
           node.userData.clickable = false;
-          // node.receiveShadow = true;
         }
       })
       //注释下面两行不显示房间 
       scene.add(gltf.scene);
       all_mesh.add(gltf.scene);
 
-      gltf.animations; // Array<THREE.AnimationClip>
-      gltf.scene.scale.set(2, 2, 2); // THREE.Group
+      gltf.animations;
+      gltf.scene.scale.set(2, 2, 2);
       gltf.scene.rotation.x -= Math.PI * 0.5;
-      gltf.scenes; // Array<THREE.Group>
-      gltf.asset; // Object
       gltf.scene.position.setX(-20);
       gltf.scene.position.setZ(15);
       gltf.scene.position.setY(-1);
@@ -134,38 +152,10 @@ function init() {
 
   circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true;
-
-  renderer.shadowMapSoft = true;
-
-  renderer.shadowCameraNear = 3;
-  renderer.shadowCameraFar = camera.far;
-  renderer.shadowCameraFov = 50;
-
-  renderer.shadowMapBias = 0.0039;
-  renderer.shadowMapDarkness = 0.5;
-  renderer.shadowMapWidth = 1024;
-  renderer.shadowMapHeight = 1024;
-
-  document.body.appendChild(renderer.domElement);
-
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.maxPolarAngle = Math.PI * 0.5;
-  controls.enableDamping = true;
-  controls.enableZoom = true;
-  controls.screenSpacePanning = false;
-
-  controls.object.position.set(-6,1,-15);
-  controls.target = new THREE.Vector3(-6.5,1,-16);
-
   stats = new Stats();
   document.body.appendChild(stats.dom);
 
   gui = new GUIPanel('gui-container');
-
 
   window.addEventListener('resize', onWindowResize);
   document.getElementsByTagName("canvas")[0] && document.getElementsByTagName("canvas")[0].addEventListener('click', onGlobalClick);
@@ -228,9 +218,17 @@ function onGlobalClick(event) {
 
 function animate() {
 
+  // let cameraDirection = new THREE.Vector3();
+  // camera.getWorldDirection(cameraDirection);
+  // console.log(cameraDirection);
+
+  console.log(controls.target);
+
   requestAnimationFrame(animate);
 
-  controls.update();
+  // controls.target = new THREE.Vector3(camera.position.x - 0.5, camera.position.y, camera.position.z - 1)
+
+  // controls.update();
 
   raycaster.setFromCamera(mouse, camera);
 
