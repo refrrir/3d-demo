@@ -22,6 +22,9 @@
       "@objects": [
         "./objects",
       ],
+      "@loaders": [
+        "./loaders",
+      ],
     }
   }
 }

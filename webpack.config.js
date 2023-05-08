@@ -13,6 +13,7 @@ module.exports = {
       "@models": path.resolve(__dirname, "src/models"),
       "@components": path.resolve(__dirname, "src/component"),
       "@utils": path.resolve(__dirname, "src/utils"),
+      "@loaders": path.resolve(__dirname, "src/loaders"),
     },
     extensions: ['.ts', '.js']
   },

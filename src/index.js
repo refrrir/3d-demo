@@ -5,7 +5,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh, CircuitMesh } from '@objects';
-import { CIRCUIT_TYPE, COLOR, INPUTS } from '@constants';
+import { CIRCUIT_TYPE, INPUTS } from '@constants';
+import { GroundLoader, LightLoader } from '@loaders';
 import { Utils } from '@utils';
 
 let camera, scene, renderer, controls, stats, gui;
@@ -44,59 +45,11 @@ function init() {
 
 
   // LIGHT
-
-  const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.3);
-  dirLight1.position.set(0, 20, 0);
-  dirLight1.castShadow = false;
-  scene.add(dirLight1);
-
-  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
-  dirLight2.position.set(20, 0, 0);
-  dirLight2.castShadow = false;
-  scene.add(dirLight2);
-
-  const dirLight3 = new THREE.DirectionalLight(0xffffff, 0.5);
-  dirLight3.position.set(0, 0, 20);
-  dirLight3.castShadow = false;
-  scene.add(dirLight3);
-
-  const dirLight4 = new THREE.DirectionalLight(0xffffff, 0.3);
-  dirLight4.position.set(0, -20, 0);
-  dirLight4.castShadow = false;
-  scene.add(dirLight4);
-
-  const dirLight5 = new THREE.DirectionalLight(0xffffff, 0.5);
-  dirLight5.position.set(-20, 0, 0);
-  dirLight5.castShadow = false;
-  scene.add(dirLight5);
-
-  const dirLight6 = new THREE.DirectionalLight(0xffffff, 0.4);
-  dirLight6.position.set(0, 0, -20);
-  dirLight6.castShadow = false;
-  scene.add(dirLight6);
+  LightLoader.load(scene);
 
   // GROUND
+  GroundLoader.load(scene);
 
-  const geometry = new THREE.PlaneGeometry(100, 100);
-  const planeMaterial = new THREE.MeshPhongMaterial({ color: COLOR.WHITE });
-
-  const ground = new THREE.Mesh(geometry, planeMaterial);
-
-  ground.position.set(0, -1, 0);
-  ground.rotation.x = - Math.PI / 2;
-  ground.scale.set(100, 100, 100);
-
-  ground.castShadow = false;
-  ground.receiveShadow = false;
-
-  scene.add(ground);
-
-  // GRID
-
-  const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
-  grid.material.opacity = 0.2;
-  grid.material.transparent = true;
-  scene.add(grid);
 
 
   all_mesh = new THREE.Group();
@@ -114,6 +67,8 @@ function init() {
   pipelines_mesh = new PipelineMesh(test_inputs, onPipelineClick);
 
   circuit_mesh.add(pipelines_mesh.render());
+
+  circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
   all_mesh.add(circuit_mesh);
 
@@ -149,8 +104,6 @@ function init() {
       console.log('An error happened: ' + error);
     }
   );
-
-  circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
   stats = new Stats();
   document.body.appendChild(stats.dom);
