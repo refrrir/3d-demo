@@ -39,6 +39,7 @@ function init() {
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.target = new THREE.Vector3(-6.5, 1, -16);
+  controls.panSpeed = 4;
   controls.update();
 
   all_mesh = new THREE.Group();
@@ -90,8 +91,9 @@ function onWindowResize() {
 
 function onGlobalClick(event) {
 
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / (rect.right - rect.left)) * 2 - 1;
+  mouse.y = - ((event.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
 
@@ -135,15 +137,7 @@ function onGlobalClick(event) {
 
 function animate() {
 
-  // let cameraDirection = new THREE.Vector3();
-  // camera.getWorldDirection(cameraDirection);
-  // console.log(cameraDirection);
-
   requestAnimationFrame(animate);
-
-  // controls.target = new THREE.Vector3(camera.position.x - 0.5, camera.position.y, camera.position.z - 1)
-
-  // controls.update();
 
   raycaster.setFromCamera(mouse, camera);
 
