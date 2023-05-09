@@ -3,7 +3,7 @@ import { COLOR } from '@constants';
 
 abstract class GroundLoader {
 
-    static load(scene: typeof Scene) {
+    static load(scenes: typeof Scene[]) {
 
         const geometry = new PlaneGeometry(100, 100);
         const planeMaterial = new MeshPhongMaterial({ color: COLOR.WHITE });
@@ -17,7 +17,9 @@ abstract class GroundLoader {
         ground.castShadow = false;
         ground.receiveShadow = false;
 
-        scene.add(ground);
+        scenes.forEach((scene) => {
+            scene.add(ground);
+        });
     }
 }
 

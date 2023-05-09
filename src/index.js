@@ -2,11 +2,10 @@ import * as THREE from 'three';
 
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GUIPanel } from "@components";
 import { ValveMesh, PipelineMesh, CircuitMesh } from '@objects';
 import { CIRCUIT_TYPE, INPUTS } from '@constants';
-import { GroundLoader, LightLoader } from '@loaders';
+import { GroundLoader, LightLoader, HouseGLTFLoader } from '@loaders';
 import { Utils } from '@utils';
 
 let camera, scene, renderer, controls, stats, gui;
@@ -17,10 +16,9 @@ let circuit_mesh; //线路 = 开关 + 管道
 let all_mesh; //开关 + 管道 + 外载模型 
 
 
-const loader = new GLTFLoader();
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
-const test_inputs = INPUTS.input;
+const test_inputs = INPUTS.input; //坐标信息
 
 init();
 animate();
@@ -43,15 +41,6 @@ function init() {
   controls.target = new THREE.Vector3(-6.5, 1, -16);
   controls.update();
 
-
-  // LIGHT
-  LightLoader.load(scene);
-
-  // GROUND
-  GroundLoader.load(scene);
-
-
-
   all_mesh = new THREE.Group();
   circuit_mesh = new THREE.Group();
 
@@ -59,51 +48,26 @@ function init() {
 
   // 开关初始化
   valves_mesh = new ValveMesh(test_inputs, onValveClick);
-
   circuit_mesh.add(valves_mesh.render());
 
 
   // 管道初始化
   pipelines_mesh = new PipelineMesh(test_inputs, onPipelineClick);
-
   circuit_mesh.add(pipelines_mesh.render());
 
   circuit_mesh.scale.set(0.2, 0.2, 0.2);
 
   all_mesh.add(circuit_mesh);
-
   scene.add(all_mesh);
 
-  loader.load(
-    '../models/3d_house.gltf',
-    // called when the resource is loaded
-    function (gltf) {
-      gltf.scene.traverse(function (node) {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.userData.clickable = false;
-        }
-      })
-      //注释下面两行不显示房间 
-      scene.add(gltf.scene);
-      all_mesh.add(gltf.scene);
+  // LIGHT
+  LightLoader.load(scene);
 
-      gltf.animations;
-      gltf.scene.scale.set(2, 2, 2);
-      gltf.scene.rotation.x -= Math.PI * 0.5;
-      gltf.scene.position.setX(-20);
-      gltf.scene.position.setZ(15);
-      gltf.scene.position.setY(-1);
-    },
-    // called while loading is progressing
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    // called when loading has errors
-    function (error) {
-      console.log('An error happened: ' + error);
-    }
-  );
+  // GROUND
+  GroundLoader.load([scene]);
+
+  // HOUSE
+  HouseGLTFLoader.load([scene, all_mesh]);
 
   stats = new Stats();
   document.body.appendChild(stats.dom);
@@ -174,8 +138,6 @@ function animate() {
   // let cameraDirection = new THREE.Vector3();
   // camera.getWorldDirection(cameraDirection);
   // console.log(cameraDirection);
-
-  console.log(controls.target);
 
   requestAnimationFrame(animate);
 
