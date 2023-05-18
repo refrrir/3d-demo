@@ -145,6 +145,51 @@ const input: any[] = [
             }
         ],
     },
+    // {
+    //     top_surface_center_position: new Vector3(-51, -6, -93),
+    //     bottom_surface_center_position: new Vector3(-51, -3, -93),
+    //     radius: 0.35,
+    //     information: [
+    //         { name: "ID", value: "001-E" },
+    //         { name: "Type", value: "Gas" },
+    //         { name: "Model", value: "DN120" },
+    //         { name: "Presure", value: "3.1 Kpa" },
+    //         { name: "Location", value: "outdoor" },
+    //     ],
+    //     type: CIRCUIT_TYPE.PIPELINE,
+    //     child: [
+    //         {
+    //             // 入户阀
+    //             center_position: new Vector3(-51, -3, -93),
+    //             isValveOn: true,
+    //             radius: 0.7,
+    //             information: [
+    //                 { name: "ID", value: "60-5-H" },
+    //                 { name: "Name", value: "house valve" },
+    //                 { name: "Location", value: "kitchen" },
+    //                 { name: "Type", value: "solenoid valve" },
+    //                 { name: "Model", value: "JKB-V1-DN80" },
+    //             ],
+    //             type: CIRCUIT_TYPE.VALVE,
+    //             child: [
+    //                 {
+    //                     // 入户水平管
+    //                     top_surface_center_position: new Vector3(-51, -3, -93),
+    //                     bottom_surface_center_position: new Vector3(-51, -3, -88),
+    //                     radius: 0.3,
+    //                     information: [
+    //                         { name: "ID", value: "91-P" },
+    //                         { name: "Type", value: "Gas" },
+    //                         { name: "Model", value: "DN50" },
+    //                         { name: "Presure", value: "3.2 Kpa" },
+    //                         { name: "Location", value: "kitchen" },
+    //                     ],
+    //                     type: CIRCUIT_TYPE.PIPELINE
+    //                 }
+    //             ]
+    //         }
+    //     ],
+    // }
 ]
 
 export { input };
