@@ -15,6 +15,8 @@ abstract class HouseGLTFLoader {
                 if (node.isMesh) {
                   node.castShadow = true;
                   node.userData.clickable = false;
+                  node.material.opacity = 0.6;
+                  node.material.transparent = true;
                 }
               })        
               gltf.animations;
