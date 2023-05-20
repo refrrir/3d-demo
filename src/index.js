@@ -19,6 +19,7 @@ let all_mesh; //开关 + 管道 + 外载模型
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(1, 1);
 const test_inputs = INPUTS.input; //坐标信息
+const tree_properties = INPUTS.treeProperties; //树的统一属性
 
 init();
 animate();
@@ -48,12 +49,12 @@ function init() {
   Utils.connectFromHere(test_inputs);
 
   // 开关初始化
-  valves_mesh = new ValveMesh(test_inputs, onValveClick);
+  valves_mesh = new ValveMesh(test_inputs, tree_properties, onValveClick);
   circuit_mesh.add(valves_mesh.render());
 
 
   // 管道初始化
-  pipelines_mesh = new PipelineMesh(test_inputs, onPipelineClick);
+  pipelines_mesh = new PipelineMesh(test_inputs, tree_properties, onPipelineClick);
   circuit_mesh.add(pipelines_mesh.render());
 
   circuit_mesh.scale.set(0.2, 0.2, 0.2);

@@ -1,5 +1,5 @@
 import { InstancedMesh, Matrix4, CylinderGeometry, MeshPhongMaterial, Quaternion, Vector3 } from 'three';
-import { CircuitMeshInputProps, PipelineMeshInputProps } from '@models';
+import { CircuitMeshInputProps, PipelineMeshInputProps, TreeProps } from '@models';
 import { CIRCUIT_TYPE, COLOR } from '@constants';
 import { CircuitMesh } from './circuit';
 
@@ -9,15 +9,17 @@ class PipelineMesh extends CircuitMesh {
     numberOfInstance: number;
     onClick?: (circuitProps: CircuitMeshInputProps) => void;
     type: CIRCUIT_TYPE;
+    tree_props: TreeProps[];
 
     mesh;
 
-    constructor(circuit_mesh_input_props: CircuitMeshInputProps[], onClickEvent?: (pipelineProps: CircuitMeshInputProps) => void) {
+    constructor(circuit_mesh_input_props: CircuitMeshInputProps[], tree_props: TreeProps[], onClickEvent?: (pipelineProps: CircuitMeshInputProps) => void) {
         super();
 
         this.type = CIRCUIT_TYPE.PIPELINE;
         this.numberOfInstance = 0;
         this.circuit_mesh_input_props = circuit_mesh_input_props;
+        this.tree_props = tree_props;
         this.onClick = onClickEvent;
 
         for (let i = 0; i < circuit_mesh_input_props.length; i++) {
@@ -31,7 +33,8 @@ class PipelineMesh extends CircuitMesh {
         this.numberOfInstance = 0;
     }
 
-    protected renderSingleIntance(circuitProps: CircuitMeshInputProps) {
+    protected renderSingleIntance(circuitProps: CircuitMeshInputProps, treeIndex : number) {
+        circuitProps.treeIndex = treeIndex;
         if (circuitProps.type === this.type) {
             const pipelineProps = circuitProps as PipelineMeshInputProps;
             const index = this.numberOfInstance;
@@ -51,7 +54,7 @@ class PipelineMesh extends CircuitMesh {
             cylinder_matrix.multiply(mat.makeScale(pipelineProps.radius, distance, pipelineProps.radius));
 
             pipelines_mesh.setMatrixAt(index, cylinder_matrix);
-            pipelines_mesh.setColorAt(index, pipelineProps.isConnected ? COLOR.YELLOW : COLOR.GREY);
+            pipelines_mesh.setColorAt(index, pipelineProps.isConnected ? this.tree_props[circuitProps.treeIndex].pipelineOnColor : COLOR.GREY);
 
             pipelineProps.index = index;
             this.onClick && (pipelineProps.clickable = true);
@@ -62,7 +65,7 @@ class PipelineMesh extends CircuitMesh {
         const childs = circuitProps.child;
         if (childs) {
             for (const child of childs) {
-                this.renderSingleIntance(child);
+                this.renderSingleIntance(child, treeIndex);
             }
         }
     }

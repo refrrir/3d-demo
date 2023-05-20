@@ -1,23 +1,25 @@
 import { InstancedMesh, Matrix4, IcosahedronGeometry, MeshPhongMaterial, Vector3 } from 'three';
-import { CircuitMeshInputProps, ValveMeshInputProps } from '@models';
+import { CircuitMeshInputProps, TreeProps, ValveMeshInputProps } from '@models';
 import { CIRCUIT_TYPE, COLOR } from '@constants';
 import { CircuitMesh } from './circuit';
 
-class ValveMesh extends CircuitMesh{
+class ValveMesh extends CircuitMesh {
 
     circuit_mesh_input_props;
     numberOfInstance: number;
-    onClick? : (valveProps: CircuitMeshInputProps) => void;
+    onClick?: (valveProps: CircuitMeshInputProps) => void;
     type: CIRCUIT_TYPE;
+    tree_props: TreeProps[];
 
     mesh;
 
-    constructor(circuit_mesh_input_props: CircuitMeshInputProps[], onClickEvent?: (valveProps: CircuitMeshInputProps) => void) {
+    constructor(circuit_mesh_input_props: CircuitMeshInputProps[], tree_props: TreeProps[], onClickEvent?: (valveProps: CircuitMeshInputProps) => void) {
         super();
-        
+
         this.type = CIRCUIT_TYPE.VALVE;
         this.numberOfInstance = 0;
         this.circuit_mesh_input_props = circuit_mesh_input_props;
+        this.tree_props = tree_props;
         this.onClick = onClickEvent;
 
         for (let i = 0; i < circuit_mesh_input_props.length; i++) {
@@ -31,7 +33,8 @@ class ValveMesh extends CircuitMesh{
         this.numberOfInstance = 0;
     }
 
-    protected renderSingleIntance(circuitProps: CircuitMeshInputProps) {
+    protected renderSingleIntance(circuitProps: CircuitMeshInputProps, treeIndex : number) {
+        circuitProps.treeIndex = treeIndex;
         if (circuitProps.type === CIRCUIT_TYPE.VALVE) {
             const valveProps = circuitProps as ValveMeshInputProps;
             const center: typeof Vector3 = valveProps.center_position;
@@ -58,7 +61,7 @@ class ValveMesh extends CircuitMesh{
         const childs = circuitProps.child;
         if (childs) {
             for (const child of childs) {
-                this.renderSingleIntance(child);
+                this.renderSingleIntance(child, treeIndex);
             }
         }
     }
