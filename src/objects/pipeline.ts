@@ -51,7 +51,8 @@ class PipelineMesh extends CircuitMesh {
             cylinder_matrix.multiply(mat.makeScale(pipelineProps.radius, distance, pipelineProps.radius));
 
             pipelines_mesh.setMatrixAt(index, cylinder_matrix);
-            pipelines_mesh.setColorAt(index, pipelineProps.isConnected ? COLOR.YELLOW : COLOR.GREY);
+            const pipelineOnColor = !!pipelineProps.pipelineOnColor ? pipelineProps.pipelineOnColor : COLOR.YELLOW;
+            pipelines_mesh.setColorAt(index, pipelineProps.isConnected ? pipelineOnColor : COLOR.GREY);
 
             pipelineProps.index = index;
             this.onClick && (pipelineProps.clickable = true);
@@ -62,6 +63,7 @@ class PipelineMesh extends CircuitMesh {
         const childs = circuitProps.child;
         if (childs) {
             for (const child of childs) {
+                !child.pipelineOnColor && (child.pipelineOnColor = circuitProps.pipelineOnColor);
                 this.renderSingleIntance(child);
             }
         }

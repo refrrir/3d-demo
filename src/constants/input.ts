@@ -1,5 +1,5 @@
 import { Vector3 } from 'three';
-import { CIRCUIT_TYPE } from "@constants";
+import { CIRCUIT_TYPE, COLOR } from "@constants";
 
 const input: any[] = [
     {
@@ -15,6 +15,7 @@ const input: any[] = [
             { name: "Location", value: "outdoor" },
         ],
         type: CIRCUIT_TYPE.PIPELINE,
+        pipelineOnColor: COLOR.YELLOW,
         child: [
             {
                 // 入户阀

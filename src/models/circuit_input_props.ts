@@ -1,4 +1,4 @@
-import { CIRCUIT_TYPE } from '@constants';
+import { CIRCUIT_TYPE, COLOR } from '@constants';
 
 interface Information {
     name: string;
@@ -15,6 +15,7 @@ interface CircuitMeshInputProps {
     type: CIRCUIT_TYPE;
     isConnected: boolean; //气体是否能到达此处
     index?: number;
+    pipelineOnColor?: typeof COLOR;
 
 }
 

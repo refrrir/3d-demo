@@ -58,6 +58,7 @@ class ValveMesh extends CircuitMesh{
         const childs = circuitProps.child;
         if (childs) {
             for (const child of childs) {
+                !child.pipelineOnColor && (child.pipelineOnColor = circuitProps.pipelineOnColor);
                 this.renderSingleIntance(child);
             }
         }
