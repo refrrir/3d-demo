@@ -1,6 +1,5 @@
 import { Vector3 } from 'three';
-import { CIRCUIT_TYPE, COLOR } from "@constants";
-import { TreeProps } from '@models';
+import { CIRCUIT_TYPE } from "@constants";
 
 const input: any[] = [
     {
@@ -193,12 +192,4 @@ const input: any[] = [
     // }
 ]
 
-// 树的补充信息，与input数组位置一一对应
-// 数组长度必须与input一致
-const treeProperties: TreeProps[] = [
-    {
-        pipelineOnColor: COLOR.YELLOW
-    }
-]
-
-export { input, treeProperties };
+export { input };

@@ -1,5 +1,5 @@
 import { CIRCUIT_TYPE } from "@constants";
-import { CircuitMeshInputProps, TreeProps } from "@models";
+import { CircuitMeshInputProps } from "@models";
 
 abstract class CircuitMesh {
 
@@ -8,7 +8,6 @@ abstract class CircuitMesh {
     abstract onClick?: (circuitProps: CircuitMeshInputProps) => void;
     abstract type: CIRCUIT_TYPE;
     abstract mesh: any;
-    abstract tree_props: TreeProps[];
 
     protected getNumberOfInstance(circuitProps: CircuitMeshInputProps) {
         if (circuitProps.type === this.type) {
@@ -28,7 +27,7 @@ abstract class CircuitMesh {
         const mesh = this.mesh;
 
         for (let i = 0; i < circuit_mesh_input_props.length; i++) {
-            this.renderSingleIntance(circuit_mesh_input_props[i], i);
+            this.renderSingleIntance(circuit_mesh_input_props[i]);
         }
 
         mesh.castShadow = true;
@@ -44,7 +43,7 @@ abstract class CircuitMesh {
     }
 
 
-    protected abstract renderSingleIntance(circuitProps: CircuitMeshInputProps, treeIndex : number) : void;
+    protected abstract renderSingleIntance(circuitProps: CircuitMeshInputProps) : void;
 
     static findByIndex(index: number, circuit_mesh_input_props: CircuitMeshInputProps[], type: CIRCUIT_TYPE): CircuitMeshInputProps | null {
         for (let i = 0; i < circuit_mesh_input_props.length; i++) {

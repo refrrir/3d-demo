@@ -15,7 +15,6 @@ interface CircuitMeshInputProps {
     type: CIRCUIT_TYPE;
     isConnected: boolean; //气体是否能到达此处
     index?: number;
-    treeIndex?: number;
 
 }
 
