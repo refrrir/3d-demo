@@ -97,7 +97,7 @@ function onGlobalClick(event) {
 
   raycaster.setFromCamera(mouse, camera);
 
-  const intersection = raycaster.intersectObject(all_mesh);
+  const intersection = raycaster.intersectObject(circuit_mesh);
 
   if (intersection.length > 0) {
 
@@ -129,6 +129,10 @@ function onGlobalClick(event) {
 
     }
 
+  }else{
+
+    gui.clearInfo();
+    
   }
 
 }

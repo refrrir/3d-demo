@@ -29,6 +29,11 @@ class GUIPanel {
         }
     }
 
+    clearInfo(){
+        this.gui.destroy();
+        this.gui = new GUI({ container: this.guiContainer });
+    }
+
     onValveStatusUpdate(callback: () => void) {
 
         this.gui.onChange(event => {
